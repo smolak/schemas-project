@@ -1,8 +1,6 @@
 {
     "env": {
-        "es6": true,
-        "node": true,
-        "jest": true
+        "node": true
     },
     "extends": [
         "eslint:recommended",
@@ -18,15 +16,16 @@
         "ecmaFeatures": {
             "jsx": true
         },
-        "ecmaVersion": 2018,
         "sourceType": "module"
     },
     "plugins": [
-        "jest",
+        "chai-friendly",
         "prettier",
         "react"
     ],
     "rules": {
+        "no-unused-expressions": 0,
+        "chai-friendly/no-unused-expressions": 2,
         "prettier/prettier": "error",
         "import/no-default-export": "error",
         "import/prefer-default-export": "off"
