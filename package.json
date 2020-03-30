@@ -7,7 +7,7 @@
     "lint": "eslint ./src ./test",
     "test": "mocha -r esm test/**/*.test.js",
     "test:unit": "mocha -r esm test/unit/**/*.test.js",
-    "test:unit:eatch": "mocha -w -r esm test/unit/**/*.test.js"
+    "test:unit:watch": "mocha -w -r esm test/unit/**/*.test.js"
   },
   "author": "Jacek Smolak <jacek.smolak@gmail.com> (https://github.com/smolak)",
   "license": "MIT",
