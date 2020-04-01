@@ -1,3 +1,13 @@
+const removeArchived = (items) => {
+    return items.filter((item) => {
+        if (item['http://schema.org/isPartOf']) {
+            return item['http://schema.org/isPartOf']['@id'] !== 'http://attic.schema.org';
+        }
+
+        return true;
+    });
+};
+
 export class SchemasBuilder {
     constructor({ latestVersionNumberFetcher, schemasDataFetcher }) {
         this.schemasRaw = [];
@@ -17,8 +27,9 @@ export class SchemasBuilder {
         }
 
         const schemaData = await this.schemasDataFetcher(this.latestSchemaVersion);
+        const activeData = removeArchived(schemaData);
 
-        this.schemasRaw = schemaData.filter((item) => item['@type'] === 'rdfs:Class');
-        this.propertiesRaw = schemaData.filter((item) => item['@type'] === 'rdf:Property');
+        this.schemasRaw = activeData.filter((item) => item['@type'] === 'rdfs:Class');
+        this.propertiesRaw = activeData.filter((item) => item['@type'] === 'rdf:Property');
     }
 }

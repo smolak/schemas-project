@@ -122,7 +122,7 @@ describe('SchemasBuilder class', () => {
             expect(schemasBuilder.propertiesRaw).to.satisfy(allAreProperties);
         });
 
-        it('should not miss any data while splitting to `schemas` and `properties`', async () => {
+        it('should remove archived items, leaving only active ones', async () => {
             const schemasDataFetcher = sinon.stub().resolves(dummySchemaData);
 
             const schemasBuilder = new SchemasBuilder({
@@ -133,10 +133,17 @@ describe('SchemasBuilder class', () => {
             await schemasBuilder.fetchLatestSchemaVersionNumber();
             await schemasBuilder.fetchSchemasData();
 
-            const numberOfSplitItems = schemasBuilder.propertiesRaw.length + schemasBuilder.schemasRaw.length;
-            const numberOfDummyItems = dummySchemaData.length;
+            const isNotArchived = (item) => {
+                if (item['http://schema.org/isPartOf']) {
+                    return item['http://schema.org/isPartOf']['@id'] !== 'http://attic.schema.org';
+                }
 
-            expect(numberOfSplitItems).to.equal(numberOfDummyItems);
+                return true;
+            };
+            const allAreActive = (items) => items.every(isNotArchived);
+
+            expect(schemasBuilder.schemasRaw).to.satisfy(allAreActive);
+            expect(schemasBuilder.propertiesRaw).to.satisfy(allAreActive);
         });
     });
 });
