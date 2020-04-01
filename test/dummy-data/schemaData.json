@@ -1,0 +1,26 @@
+[
+    {
+        "@id": "http://schema.org/Thing",
+        "@type": "rdfs:Class",
+        "rdfs:comment": "The most generic type of item.",
+        "rdfs:label": "Thing"
+    },
+    {
+        "@id": "http://schema.org/name",
+        "@type": "rdf:Property",
+        "http://schema.org/domainIncludes": {
+            "@id": "http://schema.org/Thing"
+        },
+        "http://schema.org/rangeIncludes": {
+            "@id": "http://schema.org/Text"
+        },
+        "http://www.w3.org/2002/07/owl#equivalentProperty": {
+            "@id": "http://purl.org/dc/terms/title"
+        },
+        "rdfs:comment": "The name of the item.",
+        "rdfs:label": "name",
+        "rdfs:subPropertyOf": {
+            "@id": "rdfs:label"
+        }
+    }
+]
