@@ -1,35 +1,40 @@
 {
-  "name": "schemas-repo",
-  "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "lint": "eslint ./src ./test",
-    "test": "mocha -r esm test/**/*.test.js",
-    "test:unit": "mocha -r esm test/unit/**/*.test.js",
-    "test:unit:watch": "mocha -w -r esm test/unit/**/*.test.js"
-  },
-  "author": "Jacek Smolak <jacek.smolak@gmail.com> (https://github.com/smolak)",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/assert": "^1.4.6",
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.1.0",
-    "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-chai-friendly": "^0.5.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^3.0.0",
-    "esm": "^3.2.25",
-    "mocha": "^7.1.1",
-    "prettier": "^2.0.2"
-  },
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  }
+    "name": "schemas-repo",
+    "version": "0.0.1",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "lint": "eslint ./src ./test",
+        "test": "mocha -r esm test/**/*.test.js",
+        "test:unit": "mocha -r esm test/unit/**/*.test.js",
+        "test:unit:watch": "mocha -w -r esm test/unit/**/*.test.js"
+    },
+    "author": "Jacek Smolak <jacek.smolak@gmail.com> (https://github.com/smolak)",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/assert": "^1.4.6",
+        "@types/chai": "^4.2.11",
+        "@types/chai-as-promised": "^7.1.2",
+        "@types/mocha": "^7.0.2",
+        "@types/sinon-chai": "^3.2.3",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb": "^18.1.0",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-chai-friendly": "^0.5.0",
+        "eslint-plugin-import": "^2.20.1",
+        "eslint-plugin-jsx-a11y": "^6.2.3",
+        "eslint-plugin-prettier": "^3.1.2",
+        "eslint-plugin-react": "^7.19.0",
+        "eslint-plugin-react-hooks": "^3.0.0",
+        "esm": "^3.2.25",
+        "mocha": "^7.1.1",
+        "prettier": "^2.0.2",
+        "sinon": "^9.0.1",
+        "sinon-chai": "^3.5.0"
+    },
+    "dependencies": {
+        "node-fetch": "^2.6.0"
+    }
 }
