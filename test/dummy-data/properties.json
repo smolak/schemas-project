@@ -1,11 +1,5 @@
 [
     {
-        "@id": "http://schema.org/Thing",
-        "@type": "rdfs:Class",
-        "rdfs:comment": "The most generic type of item.",
-        "rdfs:label": "Thing"
-    },
-    {
         "@id": "http://schema.org/name",
         "@type": "rdf:Property",
         "http://schema.org/domainIncludes": {
@@ -49,17 +43,5 @@
         },
         "rdfs:comment": "Indicates a ProductReturnPolicy that may be applicable.",
         "rdfs:label": "hasProductReturnPolicy"
-    },
-    {
-        "@id": "http://schema.org/StupidType",
-        "@type": "rdfs:Class",
-        "http://schema.org/isPartOf": {
-            "@id": "http://attic.schema.org"
-        },
-        "rdfs:comment": "A StupidType for testing.",
-        "rdfs:label": "StupidType",
-        "rdfs:subClassOf": {
-            "@id": "http://schema.org/Thing"
-        }
     }
 ]

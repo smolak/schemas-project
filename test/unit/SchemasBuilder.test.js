@@ -5,7 +5,9 @@ import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import { SchemasBuilder } from '../../src/SchemasBuilder';
-import dummySchemaData from '../dummy-data/schemaData.json';
+import dummyData from '../dummy-data';
+
+const schemaData = dummyData.allDummyData;
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -13,7 +15,7 @@ chai.use(chaiAsPromised);
 describe('SchemasBuilder class', () => {
     const defaultConstructorArguments = {
         latestVersionNumberFetcher: () => Promise.resolve('7.01'),
-        schemasDataFetcher: () => Promise.resolve(dummySchemaData)
+        schemasDataFetcher: () => Promise.resolve(schemaData)
     };
 
     it('should have `schemasRaw`, `propertiesRaw` empty by default', () => {
@@ -86,7 +88,7 @@ describe('SchemasBuilder class', () => {
         });
 
         it('should use schemaData fetcher to fetch the data using latest schema version', async () => {
-            const schemasDataFetcher = sinon.stub().resolves(dummySchemaData);
+            const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
             const schemasBuilder = new SchemasBuilder({
                 ...defaultConstructorArguments,
@@ -100,7 +102,7 @@ describe('SchemasBuilder class', () => {
         });
 
         it('should split downloaded data to `schemas` and `properties`', async () => {
-            const schemasDataFetcher = sinon.stub().resolves(dummySchemaData);
+            const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
             const schemasBuilder = new SchemasBuilder({
                 ...defaultConstructorArguments,
@@ -123,7 +125,7 @@ describe('SchemasBuilder class', () => {
         });
 
         it('should remove archived items, leaving only active ones', async () => {
-            const schemasDataFetcher = sinon.stub().resolves(dummySchemaData);
+            const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
             const schemasBuilder = new SchemasBuilder({
                 ...defaultConstructorArguments,
