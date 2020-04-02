@@ -6,6 +6,62 @@
         "rdfs:label": "Thing"
     },
     {
+        "@id": "http://schema.org/CreativeWork",
+        "@type": "rdfs:Class",
+        "http://purl.org/dc/terms/source": {
+            "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_rNews"
+        },
+        "rdfs:comment": "The most generic kind of creative work, including books, movies, photographs, software programs, etc.",
+        "rdfs:label": "CreativeWork",
+        "rdfs:subClassOf": {
+            "@id": "http://schema.org/Thing"
+        }
+    },
+    {
+        "@id": "http://schema.org/Article",
+        "@type": "rdfs:Class",
+        "http://purl.org/dc/terms/source": {
+            "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_rNews"
+        },
+        "rdfs:comment": "An article, such as a news article or piece of investigative report. Newspapers and magazines have articles of many different types and this is intended to cover them all.<br/><br/>\n\nSee also <a href=\"http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html\">blog post</a>.",
+        "rdfs:label": "Article",
+        "rdfs:subClassOf": {
+            "@id": "http://schema.org/CreativeWork"
+        }
+    },
+    {
+        "@id": "http://schema.org/VideoGame",
+        "@type": "rdfs:Class",
+        "rdfs:comment": "A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device.",
+        "rdfs:label": "VideoGame",
+        "rdfs:subClassOf": [
+            {
+                "@id": "http://schema.org/SoftwareApplication"
+            },
+            {
+                "@id": "http://schema.org/Game"
+            }
+        ]
+    },
+    {
+        "@id": "http://schema.org/Game",
+        "@type": "rdfs:Class",
+        "rdfs:comment": "The Game type represents things which are games. These are typically rule-governed recreational activities, e.g. role-playing games in which players assume the role of characters in a fictional setting.",
+        "rdfs:label": "Game",
+        "rdfs:subClassOf": {
+            "@id": "http://schema.org/CreativeWork"
+        }
+    },
+    {
+        "@id": "http://schema.org/SoftwareApplication",
+        "@type": "rdfs:Class",
+        "rdfs:comment": "A software application.",
+        "rdfs:label": "SoftwareApplication",
+        "rdfs:subClassOf": {
+            "@id": "http://schema.org/CreativeWork"
+        }
+    },
+    {
         "@id": "http://schema.org/StupidType",
         "@type": "rdfs:Class",
         "http://schema.org/isPartOf": {
