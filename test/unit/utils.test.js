@@ -1,7 +1,19 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
-import { extractSchemaLabel } from '../../src/extractSchemaLabel';
+import { extractLabelFromId, extractSchemaLabel } from '../../src/utils';
+
+describe('extractLabelFromId function', () => {
+    it('should extract label from an ID', () => {
+        expect(extractLabelFromId('http://schema.org/CreativeWork')).to.equal('CreativeWork');
+    });
+
+    describe('for a special, Class type', () => {
+        it('should return Class label', () => {
+            expect(extractLabelFromId('rdfs:Class')).to.equal('Class');
+        });
+    });
+});
 
 describe('extractSchemaLabel function', () => {
     describe('when schema label is a string', () => {
