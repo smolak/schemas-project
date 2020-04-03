@@ -7,4 +7,10 @@ describe('extractLabelFromId function', () => {
     it('should extract label from an ID', () => {
         expect(extractLabelFromId('http://schema.org/CreativeWork')).to.equal('CreativeWork');
     });
+
+    describe('for a special, Class type', () => {
+        it('should return Class label', () => {
+            expect(extractLabelFromId('rdfs:Class')).to.equal('Class');
+        });
+    });
 });
