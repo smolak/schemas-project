@@ -6,6 +6,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import { SchemasBuilder } from '../../src/SchemasBuilder';
 import dummyData from '../dummy-data';
+import { isSchema, isProperty } from '../../src/utils';
 
 const schemaData = dummyData.allDummyData;
 
@@ -112,10 +113,8 @@ describe('SchemasBuilder class', () => {
             await schemasBuilder.fetchLatestSchemaVersionNumber();
             await schemasBuilder.fetchSchemasData();
 
-            const isASchema = (item) => item['@type'] === 'rdfs:Class';
-            const isAProperty = (item) => item['@type'] === 'rdf:Property';
-            const allAreSchemas = (items) => items.every(isASchema);
-            const allAreProperties = (items) => items.every(isAProperty);
+            const allAreSchemas = (items) => items.every(isSchema);
+            const allAreProperties = (items) => items.every(isProperty);
 
             expect(schemasBuilder.schemasRaw).not.to.be.empty;
             expect(schemasBuilder.schemasRaw).to.satisfy(allAreSchemas);

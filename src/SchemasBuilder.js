@@ -1,3 +1,5 @@
+import { isSchema, isProperty } from './utils';
+
 const removeArchived = (items) => {
     return items.filter((item) => {
         if (item['http://schema.org/isPartOf']) {
@@ -29,7 +31,7 @@ export class SchemasBuilder {
         const schemaData = await this.schemasDataFetcher(this.latestSchemaVersion);
         const activeData = removeArchived(schemaData);
 
-        this.schemasRaw = activeData.filter((item) => item['@type'] === 'rdfs:Class');
-        this.propertiesRaw = activeData.filter((item) => item['@type'] === 'rdf:Property');
+        this.schemasRaw = activeData.filter(isSchema);
+        this.propertiesRaw = activeData.filter(isProperty);
     }
 }
