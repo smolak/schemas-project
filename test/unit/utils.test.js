@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
-import { extractLabelFromSchemaId, extractLabelFromSchema } from '../../src/utils';
+import { extractLabelFromSchemaId, extractLabelFromSchema, extractLabelFromSchemaType } from '../../src/utils';
 
 describe('extractLabelFromSchemaId function', () => {
     it('should extract label from an ID', () => {
@@ -41,5 +41,13 @@ describe('extractLabelFromSchema function', () => {
 
             expect(schemaLabel).to.equal('ComicStory');
         });
+    });
+});
+
+describe('extractLabelFromSchemaType function', () => {
+    it("should return no slash-prefixed URL's path", () => {
+        const schemaType = 'http://schema.org/CreativeWork';
+
+        expect(extractLabelFromSchemaType(schemaType)).to.equal('CreativeWork');
     });
 });
