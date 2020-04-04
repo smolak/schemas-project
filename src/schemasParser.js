@@ -1,4 +1,4 @@
-import { extractSchemaLabel, extractLabelFromId } from './utils';
+import { extractLabelFromSchema, extractLabelFromSchemaId } from './utils';
 
 const addParent = (schemaDataStructures, schemaLabel, parentLabel) => {
     schemaDataStructures[schemaLabel].parents.push(parentLabel);
@@ -18,7 +18,7 @@ const hasSpecificType = (schema) => typeof schema['@type'] === 'string' && schem
 
 export const parseSchemas = (schemas) => {
     const schemaDataStructures = schemas.reduce((allSchemas, schema) => {
-        const schemaLabel = extractSchemaLabel(schema);
+        const schemaLabel = extractLabelFromSchema(schema);
         const schemaDataStructure = {
             children: [],
             parents: []
@@ -31,14 +31,14 @@ export const parseSchemas = (schemas) => {
     }, {});
 
     schemas.forEach((schema) => {
-        const schemaLabel = extractSchemaLabel(schema);
+        const schemaLabel = extractLabelFromSchema(schema);
         const schemaSubClass = schema['rdfs:subClassOf'];
 
         const isOfDataType = hasDataType(schema);
         const isOfSpecificType = hasSpecificType(schema);
 
         if (isOfSpecificType) {
-            const specificTypeLabel = extractLabelFromId(schema['@type']);
+            const specificTypeLabel = extractLabelFromSchemaId(schema['@type']);
 
             addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
             addChild(schemaDataStructures, specificTypeLabel, schemaLabel);
@@ -48,7 +48,7 @@ export const parseSchemas = (schemas) => {
             const subClassData = Array.isArray(schemaSubClass) ? schemaSubClass : [schemaSubClass];
 
             subClassData.forEach((subClass) => {
-                const parentLabel = extractLabelFromId(subClass['@id']);
+                const parentLabel = extractLabelFromSchemaId(subClass['@id']);
 
                 addParent(schemaDataStructures, schemaLabel, parentLabel);
                 addChild(schemaDataStructures, parentLabel, schemaLabel);

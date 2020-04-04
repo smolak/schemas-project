@@ -3,7 +3,7 @@ import chai, { expect } from 'chai';
 import chaiThings from 'chai-things';
 
 import { parseSchemas } from '../../src/schemasParser';
-import { extractSchemaLabel } from '../../src/utils';
+import { extractLabelFromSchema } from '../../src/utils';
 import dummyData from '../dummy-data';
 
 chai.should();
@@ -22,7 +22,7 @@ describe('parseSchemas', () => {
     });
 
     it("should return an object where keys are schemas' labels", () => {
-        const labelsOfSchemasInSet = dummySchemas.map(extractSchemaLabel);
+        const labelsOfSchemasInSet = dummySchemas.map(extractLabelFromSchema);
 
         const parsedSchemas = parseSchemas(dummySchemas);
 
@@ -41,7 +41,7 @@ describe('parseSchemas', () => {
             '@id': 'http://schema.org/Thing',
             'rdfs:label': 'Thing'
         };
-        const parentSchemaLabel = extractSchemaLabel(parentSchema);
+        const parentSchemaLabel = extractLabelFromSchema(parentSchema);
         const subClassSchema = {
             '@id': 'http://schema.org/CreativeWork',
             'rdfs:label': 'CreativeWork',
@@ -49,7 +49,7 @@ describe('parseSchemas', () => {
                 '@id': 'http://schema.org/Thing'
             }
         };
-        const subClassSchemaLabel = extractSchemaLabel(subClassSchema);
+        const subClassSchemaLabel = extractLabelFromSchema(subClassSchema);
 
         it("should add that schema's name to its parent `children` property", () => {
             const schemas = [parentSchema, subClassSchema];
@@ -137,8 +137,8 @@ describe('parseSchemas', () => {
             '@type': 'rdfs:Class',
             'rdfs:label': 'MedicineSystem'
         };
-        const schemaWithSpecificTypeLabel = extractSchemaLabel(schemaWithSpecificType);
-        const specificTypeSchemaLabel = extractSchemaLabel(schemaForTheSpecificType);
+        const schemaWithSpecificTypeLabel = extractLabelFromSchema(schemaWithSpecificType);
+        const specificTypeSchemaLabel = extractLabelFromSchema(schemaForTheSpecificType);
 
         it("should add that specific type to schema's `parents` property", () => {
             const schemas = [schemaWithSpecificType, schemaForTheSpecificType];
@@ -165,7 +165,7 @@ describe('parseSchemas', () => {
         };
 
         it('should add DataType to its `parents` property', () => {
-            const schemaLabel = extractSchemaLabel(schemaWithDataTypeType);
+            const schemaLabel = extractLabelFromSchema(schemaWithDataTypeType);
             const schemas = [schemaWithDataTypeType];
 
             const parsedSchemas = parseSchemas(schemas);
