@@ -1,5 +1,13 @@
 import { extractSchemaLabel, extractLabelFromId } from './utils';
 
+const addParent = (schemaDataStructures, schemaLabel, parentLabel) => {
+    schemaDataStructures[schemaLabel].parents.push(parentLabel);
+};
+
+const addChild = (schemaDataStructures, schemaLabel, childLabel) => {
+    schemaDataStructures[schemaLabel].children.push(childLabel);
+};
+
 const hasDataType = (schema) => {
     const schemaType = schema['@type'];
 
@@ -32,8 +40,8 @@ export const parseSchemas = (schemas) => {
         if (isOfSpecificType) {
             const specificTypeLabel = extractLabelFromId(schema['@type']);
 
-            schemaDataStructures[schemaLabel].parents.push(specificTypeLabel);
-            schemaDataStructures[specificTypeLabel].children.push(schemaLabel);
+            addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
+            addChild(schemaDataStructures, specificTypeLabel, schemaLabel);
         }
 
         if (schemaSubClass) {
@@ -42,13 +50,13 @@ export const parseSchemas = (schemas) => {
             subClassData.forEach((subClass) => {
                 const parentLabel = extractLabelFromId(subClass['@id']);
 
-                schemaDataStructures[parentLabel].children.push(schemaLabel);
-                schemaDataStructures[schemaLabel].parents.push(parentLabel);
+                addParent(schemaDataStructures, schemaLabel, parentLabel);
+                addChild(schemaDataStructures, parentLabel, schemaLabel);
             });
         }
 
         if (isOfDataType) {
-            schemaDataStructures[schemaLabel].parents.push('DataType');
+            addParent(schemaDataStructures, schemaLabel, 'DataType');
         }
     });
 
