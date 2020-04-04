@@ -1,4 +1,4 @@
-import { extractLabelFromSchema, extractLabelFromSchemaId, extractLabelFromSchemaType } from './utils';
+import { isSchema, extractLabelFromSchema, extractLabelFromSchemaId, extractLabelFromSchemaType } from './utils';
 
 const addParent = (schemaDataStructures, schemaLabel, parentLabel) => {
     schemaDataStructures[schemaLabel].parents.push(parentLabel);
@@ -18,6 +18,10 @@ const hasSpecificType = (schema) => typeof schema['@type'] === 'string' && schem
 
 export const parseSchemas = (schemas) => {
     const schemaDataStructures = schemas.reduce((allSchemas, schema) => {
+        if (!isSchema(schema)) {
+            throw new TypeError(`Detected an item that is not a schema. Item passed: ${JSON.stringify(schema)}`);
+        }
+
         const schemaLabel = extractLabelFromSchema(schema);
         const schemaDataStructure = {
             children: [],

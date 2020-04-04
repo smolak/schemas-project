@@ -12,6 +12,17 @@ chai.use(chaiThings);
 const { dummySchemas } = dummyData;
 
 describe('parseSchemas', () => {
+    describe("when any of the schema's passed is not a schema", () => {
+        it('should throw with info about item that was of different type', () => {
+            const property = {
+                '@type': 'rdf:Property'
+            };
+            const notSchemas = [property];
+
+            expect(() => parseSchemas(notSchemas)).to.throw(TypeError, JSON.stringify(property));
+        });
+    });
+
     it('should extract all schemas from passed set', () => {
         const parsedSchemas = parseSchemas(dummySchemas);
 
