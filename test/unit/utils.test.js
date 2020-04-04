@@ -4,12 +4,14 @@ import { expect } from 'chai';
 import { extractLabelFromSchemaId, extractLabelFromSchema, extractLabelFromSchemaType } from '../../src/utils';
 
 describe('extractLabelFromSchemaId function', () => {
-    it('should extract label from an ID', () => {
-        expect(extractLabelFromSchemaId('http://schema.org/CreativeWork')).to.equal('CreativeWork');
+    describe("when schema's ID is set as URL", () => {
+        it("should return no slash-prefixed URL's path", () => {
+            expect(extractLabelFromSchemaId('http://schema.org/CreativeWork')).to.equal('CreativeWork');
+        });
     });
 
-    describe('for a special, Class type', () => {
-        it('should return Class label', () => {
+    describe("when schema's ID is set as rdfs:Class", () => {
+        it('should return Class string', () => {
             expect(extractLabelFromSchemaId('rdfs:Class')).to.equal('Class');
         });
     });
@@ -29,7 +31,7 @@ describe('extractLabelFromSchema function', () => {
     });
 
     describe('when schema label is an object', () => {
-        it('should extract schema label from that object', () => {
+        it('should return @value property from that object', () => {
             const schema = {
                 'rdfs:label': {
                     '@language': 'en',
@@ -46,8 +48,6 @@ describe('extractLabelFromSchema function', () => {
 
 describe('extractLabelFromSchemaType function', () => {
     it("should return no slash-prefixed URL's path", () => {
-        const schemaType = 'http://schema.org/CreativeWork';
-
-        expect(extractLabelFromSchemaType(schemaType)).to.equal('CreativeWork');
+        expect(extractLabelFromSchemaType('http://schema.org/CreativeWork')).to.equal('CreativeWork');
     });
 });
