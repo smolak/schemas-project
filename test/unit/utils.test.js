@@ -1,7 +1,13 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
-import { extractLabelFromSchemaId, extractLabelFromSchema, extractLabelFromSchemaType } from '../../src/utils';
+import {
+    isProperty,
+    isSchema,
+    extractLabelFromSchemaId,
+    extractLabelFromSchema,
+    extractLabelFromSchemaType
+} from '../../src/utils';
 
 describe('extractLabelFromSchemaId function', () => {
     describe("when schema's ID is set as URL", () => {
@@ -49,5 +55,43 @@ describe('extractLabelFromSchema function', () => {
 describe('extractLabelFromSchemaType function', () => {
     it("should return no slash-prefixed URL's path", () => {
         expect(extractLabelFromSchemaType('http://schema.org/CreativeWork')).to.equal('CreativeWork');
+    });
+});
+
+describe('isProperty function', () => {
+    it('should return `true` when type is equal to `rdf:Property`', () => {
+        const property = {
+            '@type': 'rdf:Property'
+        };
+
+        expect(isProperty(property)).to.be.true;
+    });
+
+    it('should return `false` when type is anything else', () => {
+        const schema = {
+            '@type': 'rdfs:Class'
+        };
+
+        expect(isProperty(schema)).to.be.false;
+    });
+});
+
+describe('isSchema function', () => {
+    describe('given that there are only two types of data: Properties and Schemas', () => {
+        it('should return `true` if it is not a Property', () => {
+            const schema = {
+                '@type': 'rdfs:Class'
+            };
+
+            expect(isSchema(schema)).to.be.true;
+        });
+
+        it('should return `false` if it is a Property', () => {
+            const property = {
+                '@type': 'rdf:Property'
+            };
+
+            expect(isSchema(property)).to.be.false;
+        });
     });
 });

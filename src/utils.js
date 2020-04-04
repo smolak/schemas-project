@@ -17,3 +17,7 @@ export const extractLabelFromSchema = (schema) => {
 
     return label;
 };
+
+export const isProperty = (item) => item['@type'] === 'rdf:Property';
+
+export const isSchema = (item) => !isProperty(item);
