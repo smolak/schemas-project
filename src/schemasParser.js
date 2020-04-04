@@ -1,4 +1,4 @@
-import { extractLabelFromSchema, extractLabelFromSchemaId } from './utils';
+import { extractLabelFromSchema, extractLabelFromSchemaId, extractLabelFromSchemaType } from './utils';
 
 const addParent = (schemaDataStructures, schemaLabel, parentLabel) => {
     schemaDataStructures[schemaLabel].parents.push(parentLabel);
@@ -38,7 +38,7 @@ export const parseSchemas = (schemas) => {
         const isOfSpecificType = hasSpecificType(schema);
 
         if (isOfSpecificType) {
-            const specificTypeLabel = extractLabelFromSchemaId(schema['@type']);
+            const specificTypeLabel = extractLabelFromSchemaType(schema['@type']);
 
             addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
             addChild(schemaDataStructures, specificTypeLabel, schemaLabel);
