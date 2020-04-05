@@ -4,10 +4,23 @@ import { expect } from 'chai';
 import {
     isProperty,
     isSchema,
+    extractLabelFromProperty,
     extractLabelFromSchemaId,
     extractLabelFromSchema,
     extractLabelFromSchemaType
 } from '../../src/utils';
+
+describe('extractLabelFromProperty function', () => {
+    it('should return it as is', () => {
+        const property = {
+            'rdfs:label': 'name'
+        };
+
+        const propertyLabel = extractLabelFromProperty(property);
+
+        expect(propertyLabel).to.equal('name');
+    });
+});
 
 describe('extractLabelFromSchemaId function', () => {
     describe("when schema's ID is set as URL", () => {
