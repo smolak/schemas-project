@@ -100,7 +100,7 @@ import { LiveBlogPosting, Event } from 'project/to-string'; // Again, what a cra
         },
         event: {
             startDate: Event.startDate('2015-03-09T13:00:00-07:00'),
-            name: Event.name(''Apple Spring Forward Event'')
+            name: Event.name('Apple Spring Forward Event')
         }
     }
 </script>
@@ -111,4 +111,34 @@ import { LiveBlogPosting, Event } from 'project/to-string'; // Again, what a cra
         <meta {structuredData.event.name} />
     </div>
 </div>
+```
+
+#### Creating json+ld format object (that can be stringified)
+
+```js
+import { LiveBlogPosting, Event } from 'project/to-schema-ld';
+
+const structuredData = {
+    ...LiveBlogPosting.scope('http://techcrunch.com/2015/03/08/apple-watch-event-live-blog'),
+    ...LiveBlogPosting.about(
+        Event.scope(),
+        Event.startDate('2015-03-09T13:00:00-07:00'),
+        Event.name('Apple Spring Forward Event')
+    )
+};
+```
+
+Here's one difference how a scope is introduced within a property value, in order to produce this:
+
+```json+ld
+{
+  "@context":"http://schema.org",
+  "@type":"LiveBlogPosting",
+  "@id":"http://techcrunch.com/2015/03/08/apple-watch-event-live-blog",
+  "about":{
+    "@type":"Event",
+    "startDate":"2015-03-09T13:00:00-07:00",
+    "name":"Apple Spring Forward Event"
+  }
+}
 ```
