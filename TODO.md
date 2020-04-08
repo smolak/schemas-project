@@ -89,4 +89,26 @@ import { LiveBlogPosting, Event } from 'project/to-string'; // Again, what a cra
         </div>
     </div>
   {% }) %}
+
+// Or in Svelte
+
+<script>
+    let structuredData = {
+        liveBlogPosting: {
+            scope: LiveBlogPosting.scope('http://techcrunch.com/2015/03/08/apple-watch-event-live-blog'),
+            about: LiveBlogPosting.about(Event.scope())
+        },
+        event: {
+            startDate: Event.startDate('2015-03-09T13:00:00-07:00'),
+            name: Event.name(''Apple Spring Forward Event'')
+        }
+    }
+</script>
+
+<div {structuredData.liveBlogPosting.scope}>
+    <div {structuredData.liveBlogPosting.about}>
+        <span {structuredData.event.startDate}>March 9, 2015 1:17 PM</span>
+        <meta {structuredData.event.name} />
+    </div>
+</div>
 ```
