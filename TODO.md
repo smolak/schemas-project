@@ -44,6 +44,8 @@ Aimed result
 
 #### On React components, for simple props addendum
 ```jsx harmony
+import { LiveBlogPosting, Event } from 'project/to-object'; // What a crappy name ;) 
+
 const component = () => {
     return (
         <div {...LiveBlogPosting.scope('http://techcrunch.com/2015/03/08/apple-watch-event-live-blog')}>
@@ -72,3 +74,19 @@ Every method call (`scope`, `about`, `startDate`, `name`) can take an argument. 
      value is validated for what [name expects](https://schema.org/name)
    - if value would not be provided, name would be expected to be foun in the wrapping tag, so `meta` could not be used,
      but e.g. a `<span {...Event.name()}>Apple Spring Forward Event</span>`
+
+#### On JS templates, for simple string renderings
+```html
+import { LiveBlogPosting, Event } from 'project/to-string'; // Again, what a crappy name ;) 
+
+// And in a template
+
+{% posts.map(post => { %}
+    <div {{ LiveBlogPosting.scope('http://techcrunch.com/2015/03/08/apple-watch-event-live-blog') }}>
+        <div {{ LiveBlogPosting.about(Event.scope()) }}>
+            <span {{ Event.startDate(post.startDate) }}>{{ humanReadableDate(post.startDate) }}</span>
+            <meta {{ Event.name(post.name) }} />
+        </div>
+    </div>
+  {% }) %}
+```
