@@ -1,5 +1,9 @@
 # TODO
 
+## `Don't know`s
+
+ - [ ] Figure out what to do with `"http://schema.org/supersededBy"` on both Schemas and Properties
+
 ## Ideas
 
 ### Schema builder class
