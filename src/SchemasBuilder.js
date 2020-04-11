@@ -1,4 +1,6 @@
 import { isSchema, isProperty } from './utils';
+import { parseProperties } from './propertiesParser';
+import { parseSchemas } from './schemasParser';
 
 const removeArchived = (items) => {
     return items.filter((item) => {
@@ -12,6 +14,8 @@ const removeArchived = (items) => {
 
 export class SchemasBuilder {
     constructor({ latestVersionNumberFetcher, schemasDataFetcher }) {
+        this.schemas = {};
+        this.properties = {};
         this.schemasRaw = [];
         this.propertiesRaw = [];
         this.latestSchemaVersion = null;
@@ -33,5 +37,18 @@ export class SchemasBuilder {
 
         this.schemasRaw = activeData.filter(isSchema);
         this.propertiesRaw = activeData.filter(isProperty);
+    }
+
+    parseDownloadedData() {
+        if (this.propertiesRaw.length === 0) {
+            throw new Error('`propertiesRaw` are required to be set before parsing can be done.');
+        }
+
+        if (this.schemasRaw.length === 0) {
+            throw new Error('`schemasRaw` are required to be set before parsing can be done.');
+        }
+
+        this.properties = parseProperties(this.propertiesRaw);
+        this.schemas = parseSchemas(this.schemasRaw);
     }
 }

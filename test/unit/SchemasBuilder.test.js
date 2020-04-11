@@ -19,9 +19,11 @@ describe('SchemasBuilder class', () => {
         schemasDataFetcher: () => Promise.resolve(schemaData)
     };
 
-    it('should have `schemasRaw`, `propertiesRaw` empty by default', () => {
+    it('should have `schemas, `properties`, `schemasRaw`, `propertiesRaw` empty by default', () => {
         const schemasBuilder = new SchemasBuilder(defaultConstructorArguments);
 
+        expect(schemasBuilder.schemas).to.be.an('object').to.be.empty;
+        expect(schemasBuilder.properties).to.be.an('object').to.be.empty;
         expect(schemasBuilder.schemasRaw).to.be.an('array').to.be.empty;
         expect(schemasBuilder.propertiesRaw).to.be.an('array').to.be.empty;
     });
@@ -147,6 +149,108 @@ describe('SchemasBuilder class', () => {
                 expect(schemasBuilder.schemasRaw).to.satisfy(allAreActive);
                 expect(schemasBuilder.propertiesRaw).to.satisfy(allAreActive);
             });
+        });
+    });
+
+    describe('parseDownloadedData method', () => {
+        describe('when rawProperties are not set', () => {
+            it('should throw an error about not prepared raw properties data', async () => {
+                const schemasDataFetcher = sinon.stub().resolves(dummyData.dummySchemas);
+                const schemasBuilder = new SchemasBuilder({
+                    ...defaultConstructorArguments,
+                    schemasDataFetcher
+                });
+
+                await schemasBuilder.fetchLatestSchemaVersionNumber();
+                await schemasBuilder.fetchSchemasData();
+
+                expect(schemasBuilder.propertiesRaw).to.be.empty;
+                expect(() => schemasBuilder.parseDownloadedData()).to.throw(
+                    '`propertiesRaw` are required to be set before parsing can be done.'
+                );
+            });
+        });
+
+        describe('when rawSchemas are not set', () => {
+            it('should throw an error about not prepared raw schemas data', async () => {
+                const schemasDataFetcher = sinon.stub().resolves(dummyData.dummyProperties);
+                const schemasBuilder = new SchemasBuilder({
+                    ...defaultConstructorArguments,
+                    schemasDataFetcher
+                });
+
+                await schemasBuilder.fetchLatestSchemaVersionNumber();
+                await schemasBuilder.fetchSchemasData();
+
+                expect(schemasBuilder.schemasRaw).to.be.empty;
+                expect(() => schemasBuilder.parseDownloadedData()).to.throw(
+                    '`schemasRaw` are required to be set before parsing can be done.'
+                );
+            });
+        });
+
+        it('should parse downloaded properties', async () => {
+            const downloadedSchemasData = [...dummyData.dummySchemas, ...dummyData.dummyProperties];
+            const schemasBuilder = new SchemasBuilder({
+                ...defaultConstructorArguments,
+                schemasDataFetcher: () => Promise.resolve(downloadedSchemasData)
+            });
+
+            await schemasBuilder.fetchLatestSchemaVersionNumber();
+            await schemasBuilder.fetchSchemasData();
+
+            schemasBuilder.parseDownloadedData();
+
+            const expectedParsedProperties = {
+                name: {
+                    usedIn: ['Thing'],
+                    valueTypes: ['Text']
+                }
+            };
+
+            expect(schemasBuilder.properties).to.deep.equal(expectedParsedProperties);
+        });
+
+        it('should parse downloaded schemas', async () => {
+            const downloadedSchemasData = [...dummyData.dummySchemas, ...dummyData.dummyProperties];
+            const schemasBuilder = new SchemasBuilder({
+                ...defaultConstructorArguments,
+                schemasDataFetcher: () => Promise.resolve(downloadedSchemasData)
+            });
+
+            await schemasBuilder.fetchLatestSchemaVersionNumber();
+            await schemasBuilder.fetchSchemasData();
+
+            schemasBuilder.parseDownloadedData();
+
+            const expectedParsedSchemas = {
+                Thing: {
+                    children: ['CreativeWork'],
+                    parents: []
+                },
+                CreativeWork: {
+                    children: ['Article', 'Game', 'SoftwareApplication'],
+                    parents: ['Thing']
+                },
+                Article: {
+                    children: [],
+                    parents: ['CreativeWork']
+                },
+                VideoGame: {
+                    children: [],
+                    parents: ['SoftwareApplication', 'Game']
+                },
+                Game: {
+                    children: ['VideoGame'],
+                    parents: ['CreativeWork']
+                },
+                SoftwareApplication: {
+                    children: ['VideoGame'],
+                    parents: ['CreativeWork']
+                }
+            };
+
+            expect(schemasBuilder.schemas).to.deep.equal(expectedParsedSchemas);
         });
     });
 });
