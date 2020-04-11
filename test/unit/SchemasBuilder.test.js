@@ -123,28 +123,30 @@ describe('SchemasBuilder class', () => {
             expect(schemasBuilder.propertiesRaw).to.satisfy(allAreProperties);
         });
 
-        it('should remove archived items, leaving only active ones', async () => {
-            const schemasDataFetcher = sinon.stub().resolves(schemaData);
+        describe('when downloaded data contains archived items', () => {
+            it('should remove archived items, leaving only active ones', async () => {
+                const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
-            const schemasBuilder = new SchemasBuilder({
-                ...defaultConstructorArguments,
-                schemasDataFetcher
+                const schemasBuilder = new SchemasBuilder({
+                    ...defaultConstructorArguments,
+                    schemasDataFetcher
+                });
+
+                await schemasBuilder.fetchLatestSchemaVersionNumber();
+                await schemasBuilder.fetchSchemasData();
+
+                const isNotArchived = (item) => {
+                    if (item['http://schema.org/isPartOf']) {
+                        return item['http://schema.org/isPartOf']['@id'] !== 'http://attic.schema.org';
+                    }
+
+                    return true;
+                };
+                const allAreActive = (items) => items.every(isNotArchived);
+
+                expect(schemasBuilder.schemasRaw).to.satisfy(allAreActive);
+                expect(schemasBuilder.propertiesRaw).to.satisfy(allAreActive);
             });
-
-            await schemasBuilder.fetchLatestSchemaVersionNumber();
-            await schemasBuilder.fetchSchemasData();
-
-            const isNotArchived = (item) => {
-                if (item['http://schema.org/isPartOf']) {
-                    return item['http://schema.org/isPartOf']['@id'] !== 'http://attic.schema.org';
-                }
-
-                return true;
-            };
-            const allAreActive = (items) => items.every(isNotArchived);
-
-            expect(schemasBuilder.schemasRaw).to.satisfy(allAreActive);
-            expect(schemasBuilder.propertiesRaw).to.satisfy(allAreActive);
         });
     });
 });
