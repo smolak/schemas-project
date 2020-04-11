@@ -3,6 +3,7 @@
 ## `Don't know`s
 
  - [ ] Figure out what to do with `"http://schema.org/supersededBy"` on both Schemas and Properties
+ - [ ] Figure out what to do with `"rdfs:subPropertyOf"` on Properties. Probably nothing, as a property, that is a subproperty of another, is being used in more specific schema. Semantically is similar, but for a more specific use case (schema) there is a more specific description (property).
 
 ## Ideas
 
