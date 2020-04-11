@@ -88,7 +88,7 @@ describe('SchemasBuilder class', () => {
             });
         });
 
-        it('should use schemaData fetcher to fetch the data using latest schema version', async () => {
+        it('should use schemaData fetcher to fetch the latest schema version data', async () => {
             const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
             const schemasBuilder = new SchemasBuilder({
@@ -102,7 +102,7 @@ describe('SchemasBuilder class', () => {
             expect(schemasDataFetcher).to.have.been.calledOnceWith('7.01');
         });
 
-        it('should split downloaded data to `schemas` and `properties`', async () => {
+        it('should split downloaded data to `rawSchemas` and `rawProperties`', async () => {
             const schemasDataFetcher = sinon.stub().resolves(schemaData);
 
             const schemasBuilder = new SchemasBuilder({
