@@ -32,19 +32,21 @@ describe('parseSchemas', () => {
         expect(numberOfSchemasInSet).to.equal(numberOfParsedSchemas);
     });
 
-    it("should return an object where keys are schemas' labels", () => {
-        const labelsOfSchemasInSet = dummySchemas.map(extractLabelFromSchema);
+    describe('returns an object which', () => {
+        it("keys are schemas' labels", () => {
+            const labelsOfSchemasInSet = dummySchemas.map(extractLabelFromSchema);
 
-        const parsedSchemas = parseSchemas(dummySchemas);
+            const parsedSchemas = parseSchemas(dummySchemas);
 
-        expect(Object.keys(parsedSchemas)).to.deep.equal(labelsOfSchemasInSet);
-    });
+            expect(Object.keys(parsedSchemas)).to.deep.equal(labelsOfSchemasInSet);
+        });
 
-    it('should return an object where values have `children` and `parents` properties', () => {
-        const parsedSchemas = parseSchemas(dummySchemas);
+        it('values are objects with `children` and `parents` properties', () => {
+            const parsedSchemas = parseSchemas(dummySchemas);
 
-        Object.values(parsedSchemas).should.all.have.property('children');
-        Object.values(parsedSchemas).should.all.have.property('parents');
+            Object.values(parsedSchemas).should.all.have.property('children');
+            Object.values(parsedSchemas).should.all.have.property('parents');
+        });
     });
 
     describe('when a schema is a sub class of other / parent schema', () => {
