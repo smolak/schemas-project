@@ -61,11 +61,11 @@ export class SchemasBuilder {
 
     combineParsedData() {
         if (Object.entries(this.parsedProperties).length === 0) {
-            throw new Error('`parsedProperties` are required for data to be combined.');
+            throw new Error("`parsedProperties` are required for data to be combined and can't be empty.");
         }
 
         if (Object.entries(this.parsedSchemas).length === 0) {
-            throw new Error('`parsedSchemas` are required for data to be combined.');
+            throw new Error("`parsedSchemas` are required for data to be combined and can't be empty.");
         }
     }
 }

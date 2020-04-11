@@ -269,7 +269,7 @@ describe('SchemasBuilder class', () => {
 
                 expect(schemasBuilder.parsedProperties).to.be.empty;
                 expect(() => schemasBuilder.combineParsedData()).to.throw(
-                    '`parsedProperties` are required for data to be combined.'
+                    "`parsedProperties` are required for data to be combined and can't be empty."
                 );
             });
         });
@@ -288,7 +288,7 @@ describe('SchemasBuilder class', () => {
 
                 expect(schemasBuilder.parsedSchemas).to.be.empty;
                 expect(() => schemasBuilder.combineParsedData()).to.throw(
-                    '`parsedSchemas` are required for data to be combined.'
+                    "`parsedSchemas` are required for data to be combined and can't be empty."
                 );
             });
         });
