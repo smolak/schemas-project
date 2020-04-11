@@ -19,11 +19,11 @@ describe('SchemasBuilder class', () => {
         schemasDataFetcher: () => Promise.resolve(schemaData)
     };
 
-    it('should have `schemas, `properties`, `schemasRaw`, `propertiesRaw` empty by default', () => {
+    it('should have `parsedSchemas, `parsedProperties`, `schemasRaw`, `propertiesRaw` empty by default', () => {
         const schemasBuilder = new SchemasBuilder(defaultConstructorArguments);
 
-        expect(schemasBuilder.schemas).to.be.an('object').to.be.empty;
-        expect(schemasBuilder.properties).to.be.an('object').to.be.empty;
+        expect(schemasBuilder.parsedSchemas).to.be.an('object').to.be.empty;
+        expect(schemasBuilder.parsedProperties).to.be.an('object').to.be.empty;
         expect(schemasBuilder.schemasRaw).to.be.an('array').to.be.empty;
         expect(schemasBuilder.propertiesRaw).to.be.an('array').to.be.empty;
     });
@@ -208,7 +208,7 @@ describe('SchemasBuilder class', () => {
                 }
             };
 
-            expect(schemasBuilder.properties).to.deep.equal(expectedParsedProperties);
+            expect(schemasBuilder.parsedProperties).to.deep.equal(expectedParsedProperties);
         });
 
         it('should parse downloaded schemas', async () => {
@@ -250,7 +250,7 @@ describe('SchemasBuilder class', () => {
                 }
             };
 
-            expect(schemasBuilder.schemas).to.deep.equal(expectedParsedSchemas);
+            expect(schemasBuilder.parsedSchemas).to.deep.equal(expectedParsedSchemas);
         });
     });
 });

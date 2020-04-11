@@ -14,8 +14,8 @@ const removeArchived = (items) => {
 
 export class SchemasBuilder {
     constructor({ latestVersionNumberFetcher, schemasDataFetcher }) {
-        this.schemas = {};
-        this.properties = {};
+        this.parsedSchemas = {};
+        this.parsedProperties = {};
         this.schemasRaw = [];
         this.propertiesRaw = [];
         this.latestSchemaVersion = null;
@@ -48,7 +48,7 @@ export class SchemasBuilder {
             throw new Error('`schemasRaw` are required to be set before parsing can be done.');
         }
 
-        this.properties = parseProperties(this.propertiesRaw);
-        this.schemas = parseSchemas(this.schemasRaw);
+        this.parsedProperties = parseProperties(this.propertiesRaw);
+        this.parsedSchemas = parseSchemas(this.schemasRaw);
     }
 }
