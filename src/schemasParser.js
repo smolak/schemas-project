@@ -15,13 +15,16 @@ const hasDataType = (schema) => {
 };
 
 const hasSpecificType = (schema) => typeof schema['@type'] === 'string' && schema['@type'] !== 'rdfs:Class';
+const typecheck = (schema) => {
+    if (!isSchema(schema)) {
+        throw new TypeError(`Detected an item that is not a schema. Item passed: ${JSON.stringify(schema)}`);
+    }
+};
 
 export const parseSchemas = (schemas) => {
-    const schemaDataStructures = schemas.reduce((allSchemas, schema) => {
-        if (!isSchema(schema)) {
-            throw new TypeError(`Detected an item that is not a schema. Item passed: ${JSON.stringify(schema)}`);
-        }
+    schemas.forEach(typecheck);
 
+    const schemaDataStructures = schemas.reduce((allSchemas, schema) => {
         const schemaLabel = extractLabelFromSchema(schema);
         const schemaDataStructure = {
             children: [],

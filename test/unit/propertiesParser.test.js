@@ -15,9 +15,7 @@ describe('parseProperties', () => {
     describe("when any of the schema's passed is not a schema", () => {
         it('should throw with info about item that was of different type', () => {
             const schema = {
-                '@type': 'rdfs:Class',
-                'http://schema.org/domainIncludes': [],
-                'http://schema.org/rangeIncludes': []
+                '@type': 'rdfs:Class'
             };
             const notProperties = [schema];
 

@@ -20,12 +20,16 @@ const takeIfInfoWhereItIsUsedAndWhatValueTypesItCanHave = (property) => {
     return property['http://schema.org/domainIncludes'] && property['http://schema.org/rangeIncludes'];
 };
 
-export const parseProperties = (properties) => {
-    return properties.filter(takeIfInfoWhereItIsUsedAndWhatValueTypesItCanHave).reduce((dataStructure, property) => {
-        if (!isProperty(property)) {
-            throw new TypeError(`Detected an item that is not a property. Item passed: ${JSON.stringify(property)}`);
-        }
+const typecheck = (property) => {
+    if (!isProperty(property)) {
+        throw new TypeError(`Detected an item that is not a property. Item passed: ${JSON.stringify(property)}`);
+    }
+};
 
+export const parseProperties = (properties) => {
+    properties.forEach(typecheck);
+
+    return properties.filter(takeIfInfoWhereItIsUsedAndWhatValueTypesItCanHave).reduce((dataStructure, property) => {
         const propertyLabel = extractLabelFromProperty(property);
         const propertyDataStructure = {
             usedIn: extractSchemaLabelsPropertyIsUsedIn(property),
