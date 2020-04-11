@@ -13,7 +13,7 @@ const removeArchived = (items) => {
 };
 
 export class SchemasBuilder {
-    constructor({ latestVersionNumberFetcher, schemasDataFetcher }) {
+    constructor({ latestVersionNumberFetcher, schemasDataFetcher, propertiesParser = parseProperties }) {
         this.parsedSchemas = {};
         this.parsedProperties = {};
         this.schemasRaw = [];
@@ -21,6 +21,7 @@ export class SchemasBuilder {
         this.latestSchemaVersion = null;
         this.latestSchemaVersionNumberFetcher = latestVersionNumberFetcher;
         this.schemasDataFetcher = schemasDataFetcher;
+        this.parseProperties = propertiesParser;
     }
 
     async fetchLatestSchemaVersionNumber() {
@@ -48,7 +49,13 @@ export class SchemasBuilder {
             throw new Error('`schemasRaw` are required to be set before parsing can be done.');
         }
 
-        this.parsedProperties = parseProperties(this.propertiesRaw);
+        this.parsedProperties = this.parseProperties(this.propertiesRaw);
         this.parsedSchemas = parseSchemas(this.schemasRaw);
+    }
+
+    combineParsedData() {
+        if (Object.entries(this.parsedProperties).length === 0) {
+            throw new Error('`parsedProperties` are required for data to be combined.');
+        }
     }
 }

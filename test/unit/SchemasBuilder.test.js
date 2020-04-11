@@ -253,4 +253,25 @@ describe('SchemasBuilder class', () => {
             expect(schemasBuilder.parsedSchemas).to.deep.equal(expectedParsedSchemas);
         });
     });
+
+    describe('combineParsedData method', () => {
+        describe('when parsedProperties are empty', () => {
+            it('should throw error about empty parsed properties', async () => {
+                const propertiesParser = sinon.stub().returns({});
+                const schemasBuilder = new SchemasBuilder({
+                    ...defaultConstructorArguments,
+                    propertiesParser
+                });
+
+                await schemasBuilder.fetchLatestSchemaVersionNumber();
+                await schemasBuilder.fetchSchemasData();
+                schemasBuilder.parseDownloadedData();
+
+                expect(schemasBuilder.parsedProperties).to.be.empty;
+                expect(() => schemasBuilder.combineParsedData()).to.throw(
+                    '`parsedProperties` are required for data to be combined.'
+                );
+            });
+        });
+    });
 });
