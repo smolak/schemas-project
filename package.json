@@ -31,8 +31,8 @@
         "eslint-plugin-react-hooks": "^3.0.0",
         "esm": "^3.2.25",
         "mocha": "^7.1.1",
-        "prettier": "^2.0.2",
-        "sinon": "^9.0.1",
+        "prettier": "^2.0.4",
+        "sinon": "^9.0.2",
         "sinon-chai": "^3.5.0"
     },
     "dependencies": {
