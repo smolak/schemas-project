@@ -13,7 +13,12 @@ const removeArchived = (items) => {
 };
 
 export class SchemasBuilder {
-    constructor({ latestVersionNumberFetcher, schemasDataFetcher, propertiesParser = parseProperties }) {
+    constructor({
+        latestVersionNumberFetcher,
+        schemasDataFetcher,
+        propertiesParser = parseProperties,
+        schemasParser = parseSchemas
+    }) {
         this.parsedSchemas = {};
         this.parsedProperties = {};
         this.schemasRaw = [];
@@ -22,6 +27,7 @@ export class SchemasBuilder {
         this.latestSchemaVersionNumberFetcher = latestVersionNumberFetcher;
         this.schemasDataFetcher = schemasDataFetcher;
         this.parseProperties = propertiesParser;
+        this.parseSchemas = schemasParser;
     }
 
     async fetchLatestSchemaVersionNumber() {
@@ -50,12 +56,16 @@ export class SchemasBuilder {
         }
 
         this.parsedProperties = this.parseProperties(this.propertiesRaw);
-        this.parsedSchemas = parseSchemas(this.schemasRaw);
+        this.parsedSchemas = this.parseSchemas(this.schemasRaw);
     }
 
     combineParsedData() {
         if (Object.entries(this.parsedProperties).length === 0) {
             throw new Error('`parsedProperties` are required for data to be combined.');
+        }
+
+        if (Object.entries(this.parsedSchemas).length === 0) {
+            throw new Error('`parsedSchemas` are required for data to be combined.');
         }
     }
 }
