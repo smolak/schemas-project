@@ -75,7 +75,7 @@ describe('SchemasBuilder class', () => {
 
     describe('fetchSchemasData method', () => {
         describe('when schema version is not set yet', () => {
-            it('should throw and error about a missing version for which the data is to be fetched', () => {
+            it('should throw an error about a missing version for which the data is to be fetched', () => {
                 const schemasBuilder = new SchemasBuilder({
                     ...defaultConstructorArguments
                 });
