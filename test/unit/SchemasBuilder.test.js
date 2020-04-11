@@ -256,7 +256,7 @@ describe('SchemasBuilder class', () => {
 
     describe('combineParsedData method', () => {
         describe('when parsedProperties are empty', () => {
-            it('should throw error about empty parsed properties', async () => {
+            it('should throw error about method not being able to combine the data', async () => {
                 const propertiesParser = sinon.stub().returns({});
                 const schemasBuilder = new SchemasBuilder({
                     ...defaultConstructorArguments,
