@@ -11,14 +11,31 @@ import {
 } from '../../src/utils';
 
 describe('extractLabelFromProperty function', () => {
-    it('should return it as is', () => {
-        const property = {
-            'rdfs:label': 'name'
-        };
+    describe('when property label is a string', () => {
+        it('should return it as is', () => {
+            const property = {
+                'rdfs:label': 'name'
+            };
 
-        const propertyLabel = extractLabelFromProperty(property);
+            const propertyLabel = extractLabelFromProperty(property);
 
-        expect(propertyLabel).to.equal('name');
+            expect(propertyLabel).to.equal('name');
+        });
+    });
+
+    describe('when property label is an object', () => {
+        it('should return @value property from that object', () => {
+            const property = {
+                'rdfs:label': {
+                    '@language': 'en',
+                    '@value': 'translationOfWork'
+                }
+            };
+
+            const propertyLabel = extractLabelFromSchema(property);
+
+            expect(propertyLabel).to.equal('translationOfWork');
+        });
     });
 });
 

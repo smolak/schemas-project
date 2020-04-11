@@ -1,7 +1,5 @@
 export const extractLabelFromSchemaType = (schemaType) => schemaType.split('http://schema.org/')[1];
 
-export const extractLabelFromProperty = (property) => property['rdfs:label'];
-
 export const extractLabelFromSchemaId = (schemaId) => {
     if (schemaId === 'rdfs:Class') {
         return 'Class';
@@ -10,8 +8,8 @@ export const extractLabelFromSchemaId = (schemaId) => {
     return schemaId.split('http://schema.org/')[1];
 };
 
-export const extractLabelFromSchema = (schema) => {
-    const label = schema['rdfs:label'];
+const extractLabel = (schemaOrProperty) => {
+    const label = schemaOrProperty['rdfs:label'];
 
     if (typeof label === 'object') {
         return label['@value'];
@@ -19,6 +17,9 @@ export const extractLabelFromSchema = (schema) => {
 
     return label;
 };
+
+export const extractLabelFromProperty = extractLabel;
+export const extractLabelFromSchema = extractLabel;
 
 export const isProperty = (item) => item['@type'] === 'rdf:Property';
 
