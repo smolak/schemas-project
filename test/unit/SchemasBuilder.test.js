@@ -226,27 +226,33 @@ describe('SchemasBuilder class', () => {
             const expectedParsedSchemas = {
                 Thing: {
                     children: ['CreativeWork'],
-                    parents: []
+                    parents: [],
+                    specificityPaths: []
                 },
                 CreativeWork: {
                     children: ['Article', 'Game', 'SoftwareApplication'],
-                    parents: ['Thing']
+                    parents: ['Thing'],
+                    specificityPaths: []
                 },
                 Article: {
                     children: [],
-                    parents: ['CreativeWork']
+                    parents: ['CreativeWork'],
+                    specificityPaths: []
                 },
                 VideoGame: {
                     children: [],
-                    parents: ['SoftwareApplication', 'Game']
+                    parents: ['SoftwareApplication', 'Game'],
+                    specificityPaths: []
                 },
                 Game: {
                     children: ['VideoGame'],
-                    parents: ['CreativeWork']
+                    parents: ['CreativeWork'],
+                    specificityPaths: []
                 },
                 SoftwareApplication: {
                     children: ['VideoGame'],
-                    parents: ['CreativeWork']
+                    parents: ['CreativeWork'],
+                    specificityPaths: []
                 }
             };
 

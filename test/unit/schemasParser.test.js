@@ -41,11 +41,12 @@ describe('parseSchemas', () => {
             expect(Object.keys(parsedSchemas)).to.deep.equal(labelsOfSchemasInSet);
         });
 
-        it('values are objects with `children` and `parents` properties', () => {
+        it('values are objects with `children`, `parents` and `specificityPath` properties', () => {
             const parsedSchemas = parseSchemas(dummySchemas);
 
             Object.values(parsedSchemas).should.all.have.property('children');
             Object.values(parsedSchemas).should.all.have.property('parents');
+            Object.values(parsedSchemas).should.all.have.property('specificityPaths');
         });
     });
 

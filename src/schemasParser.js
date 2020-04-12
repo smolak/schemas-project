@@ -30,7 +30,8 @@ export const parseSchemas = (schemas) => {
         const schemaLabel = extractLabelFromSchema(schema);
         const schemaDataStructure = {
             children: [],
-            parents: []
+            parents: [],
+            specificityPaths: []
         };
 
         return {
