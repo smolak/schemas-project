@@ -168,6 +168,52 @@ describe('parseSchemas', () => {
 
             expect(parsedSchemas[specificTypeSchemaLabel].children).to.include(schemaWithSpecificTypeLabel);
         });
+
+        describe('when there is more that one specific type', () => {
+            const schemaWithMoreThanOneSpecificType = {
+                '@id': 'http://schema.org/Radiography',
+                '@type': ['http://schema.org/MedicalSpecialty', 'http://schema.org/MedicalImagingTechnique'],
+                'rdfs:label': 'Radiography'
+            };
+            const medicalSpecialtySchema = {
+                '@id': 'http://schema.org/MedicalSpecialty',
+                '@type': 'rdfs:Class',
+                'rdfs:label': 'MedicalSpecialty'
+            };
+            const medicalImagingTechniqueSchema = {
+                '@id': 'http://schema.org/MedicalImagingTechnique',
+                '@type': 'rdfs:Class',
+                'rdfs:label': 'MedicalImagingTechnique'
+            };
+
+            it("should add all those specific types to schema's `parents` property", () => {
+                const schemas = [
+                    schemaWithMoreThanOneSpecificType,
+                    medicalSpecialtySchema,
+                    medicalImagingTechniqueSchema
+                ];
+
+                const parsedSchemas = parseSchemas(schemas);
+
+                expect(parsedSchemas.Radiography.parents).to.have.members([
+                    'MedicalSpecialty',
+                    'MedicalImagingTechnique'
+                ]);
+            });
+
+            it("should add that schema's label to all those specific ones `children` properties", () => {
+                const schemas = [
+                    schemaWithMoreThanOneSpecificType,
+                    medicalSpecialtySchema,
+                    medicalImagingTechniqueSchema
+                ];
+
+                const parsedSchemas = parseSchemas(schemas);
+
+                expect(parsedSchemas.MedicalSpecialty.children).to.include('Radiography');
+                expect(parsedSchemas.MedicalImagingTechnique.children).to.include('Radiography');
+            });
+        });
     });
 
     describe('when schema has a type of DataType (besides a generic rdfs:Class)', () => {

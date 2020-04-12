@@ -14,7 +14,9 @@ const hasDataType = (schema) => {
     return Array.isArray(schemaType) && schemaType.includes('http://schema.org/DataType');
 };
 
-const hasSpecificType = (schema) => typeof schema['@type'] === 'string' && schema['@type'] !== 'rdfs:Class';
+const hasSpecificTypeOrTypes = (schema) => {
+    return (typeof schema['@type'] === 'string' && schema['@type'] !== 'rdfs:Class') || Array.isArray(schema['@type']);
+};
 const typecheck = (schema) => {
     if (!isSchema(schema)) {
         throw new TypeError(`Detected an item that is not a schema. Item passed: ${JSON.stringify(schema)}`);
@@ -42,13 +44,16 @@ export const parseSchemas = (schemas) => {
         const schemaSubClass = schema['rdfs:subClassOf'];
 
         const isOfDataType = hasDataType(schema);
-        const isOfSpecificType = hasSpecificType(schema);
+        const isOfSpecificTypeOrTypes = hasSpecificTypeOrTypes(schema);
 
-        if (isOfSpecificType) {
-            const specificTypeLabel = extractLabelFromSchemaType(schema['@type']);
+        if (isOfSpecificTypeOrTypes && !isOfDataType) {
+            const specificTypes = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
+            const specificTypesLabels = specificTypes.map(extractLabelFromSchemaType);
 
-            addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
-            addChild(schemaDataStructures, specificTypeLabel, schemaLabel);
+            specificTypesLabels.forEach((specificTypeLabel) => {
+                addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
+                addChild(schemaDataStructures, specificTypeLabel, schemaLabel);
+            });
         }
 
         if (schemaSubClass) {
