@@ -7,11 +7,13 @@
 
 ## Ideas
 
+ - [ ] Scrape schema.org pages to verify parsed data 
+
 ### Schema builder class
 
  - [ ] split downloaded data to schemas and properties
  - [ ] introduce models for schemas and properties so that getters will create instances of given models on the fly
- - [v] add isSchema isProperty helper functions, as I check this here and there (have it defined in one place)
+ - [x] add isSchema isProperty helper functions, as I check this here and there (have it defined in one place)
 
 ### API usages [WIP]
 
