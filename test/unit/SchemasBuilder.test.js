@@ -227,32 +227,35 @@ describe('SchemasBuilder class', () => {
                 Thing: {
                     children: ['CreativeWork'],
                     parents: [],
-                    specificityPaths: []
+                    specificityPaths: ['Thing']
                 },
                 CreativeWork: {
                     children: ['Article', 'Game', 'SoftwareApplication'],
                     parents: ['Thing'],
-                    specificityPaths: []
+                    specificityPaths: ['Thing.CreativeWork']
                 },
                 Article: {
                     children: [],
                     parents: ['CreativeWork'],
-                    specificityPaths: []
+                    specificityPaths: ['Thing.CreativeWork.Article']
                 },
                 VideoGame: {
                     children: [],
                     parents: ['SoftwareApplication', 'Game'],
-                    specificityPaths: []
+                    specificityPaths: [
+                        'Thing.CreativeWork.Game.VideoGame',
+                        'Thing.CreativeWork.SoftwareApplication.VideoGame'
+                    ]
                 },
                 Game: {
                     children: ['VideoGame'],
                     parents: ['CreativeWork'],
-                    specificityPaths: []
+                    specificityPaths: ['Thing.CreativeWork.Game']
                 },
                 SoftwareApplication: {
                     children: ['VideoGame'],
                     parents: ['CreativeWork'],
-                    specificityPaths: []
+                    specificityPaths: ['Thing.CreativeWork.SoftwareApplication']
                 }
             };
 
