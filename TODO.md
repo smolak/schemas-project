@@ -7,7 +7,9 @@
 
 ## Ideas
 
- - [ ] Scrape schema.org pages to verify parsed data 
+ - [ ] Scrape schema.org pages to verify parsed data
+   - that might be problematic, as there are pages that don't have the same specificity paths defined on them, even if schemas have well defined parents or types - can't tell why
+  
 
 ### Schema builder class
 
