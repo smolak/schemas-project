@@ -4,6 +4,7 @@ import chaiThings from 'chai-things';
 
 import { parseSchemas } from '../../src/schemasParser';
 import { extractLabelFromSchema } from '../../src/utils';
+import { specificityPath } from '../../src/specificityPath';
 import dummyData from '../dummy-data';
 
 chai.should();
@@ -279,10 +280,10 @@ describe('parseSchemas', () => {
                 const parsedSchemas = parseSchemas([mostSpecificSchema, midSpecificSchema, leastSpecificSchema]);
 
                 expect(parsedSchemas[mostSpecificSchemaLabel].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel}.${mostSpecificSchemaLabel}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel, mostSpecificSchemaLabel])
                 );
                 expect(parsedSchemas[midSpecificSchemaLabel].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel])
                 );
                 expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
                     `${leastSpecificSchemaLabel}`
@@ -339,14 +340,22 @@ describe('parseSchemas', () => {
                 ]);
 
                 expect(parsedSchemas[mostSpecificSchemaWithTwoParentsLabel].specificityPaths).to.have.members([
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${mostSpecificSchemaWithTwoParentsLabel}`,
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${mostSpecificSchemaWithTwoParentsLabel}`
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel1,
+                        mostSpecificSchemaWithTwoParentsLabel
+                    ]),
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel2,
+                        mostSpecificSchemaWithTwoParentsLabel
+                    ])
                 ]);
                 expect(parsedSchemas[midSpecificSchemaLabel1].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel1])
                 );
                 expect(parsedSchemas[midSpecificSchemaLabel2].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel2])
                 );
                 expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
                     `${leastSpecificSchemaLabel}`
@@ -416,20 +425,38 @@ describe('parseSchemas', () => {
                 ]);
 
                 expect(parsedSchemas[mostSpecificSchemaWithOneParentLabel].specificityPaths).to.have.members([
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}.${mostSpecificSchemaWithOneParentLabel}`,
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}.${mostSpecificSchemaWithOneParentLabel}`
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel1,
+                        parentOfTheMostSpecificSchemaThatHasTwoParentsLabel,
+                        mostSpecificSchemaWithOneParentLabel
+                    ]),
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel2,
+                        parentOfTheMostSpecificSchemaThatHasTwoParentsLabel,
+                        mostSpecificSchemaWithOneParentLabel
+                    ])
                 ]);
                 expect(
                     parsedSchemas[parentOfTheMostSpecificSchemaThatHasTwoParentsLabel].specificityPaths
                 ).to.have.members([
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}`,
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}`
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel1,
+                        parentOfTheMostSpecificSchemaThatHasTwoParentsLabel
+                    ]),
+                    specificityPath.join([
+                        leastSpecificSchemaLabel,
+                        midSpecificSchemaLabel2,
+                        parentOfTheMostSpecificSchemaThatHasTwoParentsLabel
+                    ])
                 ]);
                 expect(parsedSchemas[midSpecificSchemaLabel1].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel1])
                 );
                 expect(parsedSchemas[midSpecificSchemaLabel2].specificityPaths).to.contain(
-                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}`
+                    specificityPath.join([leastSpecificSchemaLabel, midSpecificSchemaLabel2])
                 );
                 expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
                     `${leastSpecificSchemaLabel}`

@@ -1,4 +1,5 @@
 import { isSchema, extractLabelFromSchema, extractLabelFromSchemaId, extractLabelFromSchemaType } from './utils';
+import { specificityPath as specificityPathHelper } from './specificityPath';
 
 const addParent = (schemaDataStructures, schemaLabel, parentLabel) => {
     schemaDataStructures[schemaLabel].parents.push(parentLabel);
@@ -23,12 +24,6 @@ const typecheck = (schema) => {
     }
 };
 
-const SPECIFICITY_PATH_SEPARATOR = '.';
-
-const extendSpecificityPath = (specificityPath, childLabel) => {
-    return `${specificityPath}${SPECIFICITY_PATH_SEPARATOR}${childLabel}`;
-};
-
 const addSpecificityPathsForSchema = (schemaDataStructures, schemaLabel) => {
     const { children, specificityPaths } = schemaDataStructures[schemaLabel];
 
@@ -36,7 +31,7 @@ const addSpecificityPathsForSchema = (schemaDataStructures, schemaLabel) => {
         const childSpecificityPaths = schemaDataStructures[childLabel].specificityPaths;
 
         specificityPaths.forEach((specificityPath) => {
-            const pathToAdd = extendSpecificityPath(specificityPath, childLabel);
+            const pathToAdd = specificityPathHelper.join([specificityPath, childLabel]);
 
             if (!childSpecificityPaths.includes(pathToAdd)) {
                 childSpecificityPaths.push(pathToAdd);
