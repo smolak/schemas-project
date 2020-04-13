@@ -9,7 +9,9 @@
 
  - [ ] Scrape schema.org pages to verify parsed data
    - that might be problematic, as there are pages that don't have the same specificity paths defined on them, even if schemas have well defined parents or types - can't tell why
-  
+ - [ ] when all schemas and properties are parsed - perhaps create a tool ensuring that everything is well done, e.g.:
+   1. Check if there is only one root schema (Thing)
+   1. Check if every path on the specificityPaths begins with Thing and ends with given schema's label
 
 ### Schema builder class
 
