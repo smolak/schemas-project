@@ -233,4 +233,208 @@ describe('parseSchemas', () => {
             expect(parsedSchemas[schemaLabel].parents).to.contain('DataType');
         });
     });
+
+    describe('specificityPath', () => {
+        describe('when given schema has no parents (is a root schema)', () => {
+            it('should have only itself on the specificity path', () => {
+                const schemaWithNoParents = {
+                    '@id': 'http://schema.org/Thing',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Thing'
+                };
+
+                const parsedSchemas = parseSchemas([schemaWithNoParents]);
+
+                expect(parsedSchemas.Thing.specificityPaths).to.deep.equal(['Thing']);
+            });
+        });
+
+        describe('when schema has a parent', () => {
+            it('should have all of the ancestors, chronologically from the root to itself, on the path', () => {
+                const mostSpecificSchema = {
+                    '@id': 'http://schema.org/Residence',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Residence',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Place'
+                    }
+                };
+                const midSpecificSchema = {
+                    '@id': 'http://schema.org/Place',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Place',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                };
+                const leastSpecificSchema = {
+                    '@id': 'http://schema.org/Thing',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Thing'
+                };
+                const mostSpecificSchemaLabel = extractLabelFromSchema(mostSpecificSchema);
+                const midSpecificSchemaLabel = extractLabelFromSchema(midSpecificSchema);
+                const leastSpecificSchemaLabel = extractLabelFromSchema(leastSpecificSchema);
+
+                const parsedSchemas = parseSchemas([mostSpecificSchema, midSpecificSchema, leastSpecificSchema]);
+
+                expect(parsedSchemas[mostSpecificSchemaLabel].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel}.${mostSpecificSchemaLabel}`
+                );
+                expect(parsedSchemas[midSpecificSchemaLabel].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel}`
+                );
+                expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}`
+                );
+            });
+        });
+
+        describe('when a schema has more than one parent', () => {
+            it('should create a list of paths for all of the parents separately', () => {
+                const mostSpecificSchemaWithTwoParents = {
+                    '@id': 'http://schema.org/LocalBusiness',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'LocalBusiness',
+                    'rdfs:subClassOf': [
+                        {
+                            '@id': 'http://schema.org/Place'
+                        },
+                        {
+                            '@id': 'http://schema.org/Organization'
+                        }
+                    ]
+                };
+                const midSpecificSchema1 = {
+                    '@id': 'http://schema.org/Place',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Place',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                };
+                const midSpecificSchema2 = {
+                    '@id': 'http://schema.org/Organization',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Organization',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                };
+                const leastSpecificSchema = {
+                    '@id': 'http://schema.org/Thing',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Thing'
+                };
+                const mostSpecificSchemaWithTwoParentsLabel = extractLabelFromSchema(mostSpecificSchemaWithTwoParents);
+                const midSpecificSchemaLabel1 = extractLabelFromSchema(midSpecificSchema1);
+                const midSpecificSchemaLabel2 = extractLabelFromSchema(midSpecificSchema2);
+                const leastSpecificSchemaLabel = extractLabelFromSchema(leastSpecificSchema);
+
+                const parsedSchemas = parseSchemas([
+                    mostSpecificSchemaWithTwoParents,
+                    midSpecificSchema1,
+                    midSpecificSchema2,
+                    leastSpecificSchema
+                ]);
+
+                expect(parsedSchemas[mostSpecificSchemaWithTwoParentsLabel].specificityPaths).to.have.members([
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${mostSpecificSchemaWithTwoParentsLabel}`,
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${mostSpecificSchemaWithTwoParentsLabel}`
+                ]);
+                expect(parsedSchemas[midSpecificSchemaLabel1].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}`
+                );
+                expect(parsedSchemas[midSpecificSchemaLabel2].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}`
+                );
+                expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}`
+                );
+            });
+        });
+
+        describe('when an ancestor has more than one parent', () => {
+            it('should create a list of paths that follow the ones created by those ancestors', () => {
+                const mostSpecificSchemaWithOneParent = {
+                    '@id': 'http://schema.org/Store',
+                    '@type': 'rdfs:Class',
+                    'rdfs:comment': 'A retail good store.',
+                    'rdfs:label': 'Store',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/LocalBusiness'
+                    }
+                };
+                const parentOfTheMostSpecificSchemaThatHasTwoParents = {
+                    '@id': 'http://schema.org/LocalBusiness',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'LocalBusiness',
+                    'rdfs:subClassOf': [
+                        {
+                            '@id': 'http://schema.org/Place'
+                        },
+                        {
+                            '@id': 'http://schema.org/Organization'
+                        }
+                    ]
+                };
+                const midSpecificSchema1 = {
+                    '@id': 'http://schema.org/Place',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Place',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                };
+                const midSpecificSchema2 = {
+                    '@id': 'http://schema.org/Organization',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Organization',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                };
+                const leastSpecificSchema = {
+                    '@id': 'http://schema.org/Thing',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Thing'
+                };
+                const mostSpecificSchemaWithOneParentLabel = extractLabelFromSchema(mostSpecificSchemaWithOneParent);
+                const parentOfTheMostSpecificSchemaThatHasTwoParentsLabel = extractLabelFromSchema(
+                    parentOfTheMostSpecificSchemaThatHasTwoParents
+                );
+                const midSpecificSchemaLabel1 = extractLabelFromSchema(midSpecificSchema1);
+                const midSpecificSchemaLabel2 = extractLabelFromSchema(midSpecificSchema2);
+                const leastSpecificSchemaLabel = extractLabelFromSchema(leastSpecificSchema);
+
+                const parsedSchemas = parseSchemas([
+                    mostSpecificSchemaWithOneParent,
+                    parentOfTheMostSpecificSchemaThatHasTwoParents,
+                    midSpecificSchema1,
+                    midSpecificSchema2,
+                    leastSpecificSchema
+                ]);
+
+                expect(parsedSchemas[mostSpecificSchemaWithOneParentLabel].specificityPaths).to.have.members([
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}.${mostSpecificSchemaWithOneParentLabel}`,
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}.${mostSpecificSchemaWithOneParentLabel}`
+                ]);
+                expect(
+                    parsedSchemas[parentOfTheMostSpecificSchemaThatHasTwoParentsLabel].specificityPaths
+                ).to.have.members([
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}`,
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}.${parentOfTheMostSpecificSchemaThatHasTwoParentsLabel}`
+                ]);
+                expect(parsedSchemas[midSpecificSchemaLabel1].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel1}`
+                );
+                expect(parsedSchemas[midSpecificSchemaLabel2].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}.${midSpecificSchemaLabel2}`
+                );
+                expect(parsedSchemas[leastSpecificSchemaLabel].specificityPaths).to.contain(
+                    `${leastSpecificSchemaLabel}`
+                );
+            });
+        });
+    });
 });

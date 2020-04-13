@@ -23,6 +23,46 @@ const typecheck = (schema) => {
     }
 };
 
+const SPECIFICITY_PATH_SEPARATOR = '.';
+
+const extendSpecificityPath = (specificityPath, childLabel) => {
+    return `${specificityPath}${SPECIFICITY_PATH_SEPARATOR}${childLabel}`;
+};
+
+const addSpecificityPathsForSchema = (schemaDataStructures, schemaLabel) => {
+    const { children, specificityPaths } = schemaDataStructures[schemaLabel];
+
+    children.forEach((childLabel) => {
+        const childSpecificityPaths = schemaDataStructures[childLabel].specificityPaths;
+
+        specificityPaths.forEach((specificityPath) => {
+            const pathToAdd = extendSpecificityPath(specificityPath, childLabel);
+
+            if (!childSpecificityPaths.includes(pathToAdd)) {
+                childSpecificityPaths.push(pathToAdd);
+            }
+        });
+
+        addSpecificityPathsForSchema(schemaDataStructures, childLabel);
+    });
+};
+
+const buildSpecificityPaths = (schemaDataStructures) => {
+    const rootSchema = Object.entries(schemaDataStructures)
+        .map((entry) => {
+            return { label: entry[0], parents: entry[1].parents };
+        })
+        .find((item) => item.parents.length === 0);
+
+    if (rootSchema) {
+        const rootSchemaLabel = rootSchema.label;
+
+        schemaDataStructures[rootSchemaLabel].specificityPaths.push(rootSchemaLabel);
+
+        addSpecificityPathsForSchema(schemaDataStructures, rootSchemaLabel);
+    }
+};
+
 export const parseSchemas = (schemas) => {
     schemas.forEach(typecheck);
 
@@ -72,6 +112,8 @@ export const parseSchemas = (schemas) => {
             addParent(schemaDataStructures, schemaLabel, 'DataType');
         }
     });
+
+    buildSpecificityPaths(schemaDataStructures);
 
     return schemaDataStructures;
 };
