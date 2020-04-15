@@ -1,6 +1,7 @@
 import { isSchema, isProperty } from './utils';
 import { parseProperties } from './propertiesParser';
 import { parseSchemas } from './schemasParser';
+import { specificityPath } from './specificityPath';
 
 const removeArchived = (items) => {
     return items.filter((item) => {
@@ -67,5 +68,48 @@ export class SchemasBuilder {
         if (Object.entries(this.parsedSchemas).length === 0) {
             throw new Error("`parsedSchemas` are required for data to be combined and can't be empty.");
         }
+
+        const parsedPropertiesEntries = Object.entries(this.parsedProperties);
+        const extractSchemasFromSpecificityPaths = (specificityPaths) => {
+            const schemasFromAllPaths = specificityPaths.map(specificityPath.split).flat(Infinity);
+
+            return [...new Set(schemasFromAllPaths)];
+        };
+        const getPropertiesForSchema = (schemaLabel) => {
+            return parsedPropertiesEntries
+                .filter(([, propertyData]) => {
+                    return propertyData.usedIn.includes(schemaLabel);
+                })
+                .map(([propertyLabel]) => propertyLabel);
+        };
+
+        const schemas = Object.entries(this.parsedSchemas).reduce((allSchemas, [schemaLabel, schemaData]) => {
+            const extractedSchemas = extractSchemasFromSpecificityPaths(schemaData.specificityPaths);
+            const ancestorSchemas = extractedSchemas.filter((extractedSchema) => extractedSchema !== schemaLabel);
+
+            const ancestorsProperties = ancestorSchemas.reduce((allAncestorProperties, ancestorSchema) => {
+                return {
+                    ...allAncestorProperties,
+                    [ancestorSchema]: getPropertiesForSchema(ancestorSchema)
+                };
+            }, {});
+
+            return {
+                ...allSchemas,
+                [schemaLabel]: {
+                    ...schemaData,
+                    properties: {
+                        all: extractedSchemas.map(getPropertiesForSchema).flat(),
+                        own: getPropertiesForSchema(schemaLabel),
+                        ...ancestorsProperties
+                    }
+                }
+            };
+        }, {});
+
+        return {
+            schemas,
+            properties: this.parsedProperties
+        };
     }
 }

@@ -301,5 +301,155 @@ describe('SchemasBuilder class', () => {
                 );
             });
         });
+
+        it('should return combined schemas with properties', async () => {
+            const schemasBuilder = new SchemasBuilder({
+                ...defaultConstructorArguments
+            });
+
+            await schemasBuilder.fetchLatestSchemaVersionNumber();
+            await schemasBuilder.fetchSchemasData('7.01');
+            schemasBuilder.parseDownloadedData();
+
+            const builtSchemas = schemasBuilder.combineParsedData();
+
+            expect(builtSchemas).to.be.an('object').that.has.keys('schemas', 'properties');
+        });
+
+        it('should add `properties` property to every schema', async () => {
+            const schemasBuilder = new SchemasBuilder({
+                ...defaultConstructorArguments
+            });
+
+            await schemasBuilder.fetchLatestSchemaVersionNumber();
+            await schemasBuilder.fetchSchemasData();
+            schemasBuilder.parseDownloadedData();
+
+            const builtSchemas = schemasBuilder.combineParsedData();
+            const builtSchemasData = Object.values(builtSchemas.schemas);
+
+            builtSchemasData.forEach((builtSchemaData) => {
+                expect(builtSchemaData, JSON.stringify(builtSchemaData, null, 2)).to.have.property('properties');
+            });
+        });
+
+        describe('`properties` in schemas', async () => {
+            const propertiesDedicatedForActionSchema = [
+                {
+                    '@id': 'http://schema.org/actionStatus',
+                    '@type': 'rdf:Property',
+                    'http://schema.org/domainIncludes': {
+                        '@id': 'http://schema.org/Action'
+                    },
+                    'http://schema.org/rangeIncludes': {
+                        '@id': 'http://schema.org/ActionStatusType'
+                    },
+                    'rdfs:label': 'actionStatus'
+                },
+                {
+                    '@id': 'http://schema.org/target',
+                    '@type': 'rdf:Property',
+                    'http://schema.org/domainIncludes': {
+                        '@id': 'http://schema.org/Action'
+                    },
+                    'http://schema.org/rangeIncludes': {
+                        '@id': 'http://schema.org/EntryPoint'
+                    },
+                    'rdfs:label': 'target'
+                }
+            ];
+            const propertiesDedicatedForThingSchema = [
+                {
+                    '@id': 'http://schema.org/name',
+                    '@type': 'rdf:Property',
+                    'http://schema.org/domainIncludes': {
+                        '@id': 'http://schema.org/Thing'
+                    },
+                    'http://schema.org/rangeIncludes': {
+                        '@id': 'http://schema.org/Text'
+                    },
+                    'rdfs:label': 'name'
+                },
+                {
+                    '@id': 'http://schema.org/url',
+                    '@type': 'rdf:Property',
+                    'http://schema.org/domainIncludes': {
+                        '@id': 'http://schema.org/Thing'
+                    },
+                    'http://schema.org/rangeIncludes': {
+                        '@id': 'http://schema.org/URL'
+                    },
+                    'rdfs:label': 'url'
+                }
+            ];
+            const textSchemaRequiredForPropertiesUsage = {
+                '@id': 'http://schema.org/Text',
+                '@type': ['http://schema.org/DataType', 'rdfs:Class'],
+                'rdfs:comment': 'Data type: Text.',
+                'rdfs:label': 'Text'
+            };
+            const downloadedSchemasData = [
+                {
+                    '@id': 'http://schema.org/Thing',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Thing'
+                },
+                ...propertiesDedicatedForThingSchema,
+                {
+                    '@id': 'http://schema.org/Action',
+                    '@type': 'rdfs:Class',
+                    'rdfs:label': 'Action',
+                    'rdfs:subClassOf': {
+                        '@id': 'http://schema.org/Thing'
+                    }
+                },
+                ...propertiesDedicatedForActionSchema,
+                textSchemaRequiredForPropertiesUsage
+            ];
+
+            const schemasBuilder = new SchemasBuilder({
+                ...defaultConstructorArguments,
+                schemasDataFetcher: () => Promise.resolve(downloadedSchemasData)
+            });
+
+            await schemasBuilder.fetchLatestSchemaVersionNumber();
+            await schemasBuilder.fetchSchemasData();
+            schemasBuilder.parseDownloadedData();
+
+            const builtSchemas = schemasBuilder.combineParsedData();
+
+            const thingOnlyProperties = ['name', 'url'];
+            const actionOnlyProperties = ['actionStatus', 'target'];
+
+            describe('`all`', () => {
+                it('should contain all properties for schema (self and all ancestors)', async () => {
+                    const thingAllProperties = builtSchemas.schemas.Thing.properties.all;
+                    const actionAllProperties = builtSchemas.schemas.Action.properties.all;
+
+                    expect(thingAllProperties).to.deep.equal(thingOnlyProperties);
+                    expect(actionAllProperties).to.deep.equal([...thingOnlyProperties, ...actionOnlyProperties]);
+                });
+            });
+
+            describe('`own`', () => {
+                it('should contain all properties that are assigned only to given schema (might be none)', () => {
+                    const thingOwnProperties = builtSchemas.schemas.Thing.properties.own;
+                    const actionOwnProperties = builtSchemas.schemas.Action.properties.own;
+
+                    expect(thingOwnProperties).to.deep.equal(thingOnlyProperties);
+                    expect(actionOwnProperties).to.deep.equal(actionOnlyProperties);
+                });
+            });
+
+            describe('all ancestor schemas used on specificity paths', () => {
+                it("should have their own key (schema label) value (that schema's properties) pairs present", () => {
+                    // It would be best to extract ancestors and not just hardcode them here.
+                    // In this example only Thing is an ancestor, as Action doesn't have any others.
+                    const thingProperties = builtSchemas.schemas.Action.properties.Thing;
+
+                    expect(thingProperties).to.deep.equal(thingOnlyProperties);
+                });
+            });
+        });
     });
 });
