@@ -9,8 +9,7 @@ describe('fetchAllLayersData function', () => {
             const schemaVersion = '7.01';
             const workingAllLayersDataFetcher = () =>
                 Promise.resolve({
-                    '@context': {},
-                    '@graph': [
+                    rawSchemaData: [
                         {
                             '@id': 'http://schema.org/Thing',
                             '@type': 'rdfs:Class',
