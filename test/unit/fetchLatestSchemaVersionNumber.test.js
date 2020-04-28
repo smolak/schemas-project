@@ -8,7 +8,7 @@ describe('fetchLatestSchemaVersionNumber function', () => {
         it('should return latest version number', async () => {
             const workingVersionDataFetcher = () =>
                 Promise.resolve({
-                    schemaversion: '7.01'
+                    schemaVersionNumber: '7.01'
                 });
 
             const latestVersionNumber = await fetchLatestSchemaVersionNumber(workingVersionDataFetcher);
