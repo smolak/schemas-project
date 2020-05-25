@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "build": "node -r esm ./src/index.js",
         "lint": "eslint ./src ./test",
         "test": "mocha -r esm test/**/*.test.js",
         "test:unit": "mocha -r esm './test/**/*.test.js'",
