@@ -37,6 +37,8 @@
         "sinon-chai": "^3.5.0"
     },
     "dependencies": {
-        "node-fetch": "^2.6.0"
+        "mkdirp": "^1.0.4",
+        "node-fetch": "^2.6.0",
+        "rimraf": "^3.0.2"
     }
 }
