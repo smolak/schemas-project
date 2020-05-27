@@ -20,6 +20,7 @@
         "@types/sinon-chai": "^3.2.4",
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
+        "chai-fs": "^2.0.0",
         "chai-things": "^0.2.0",
         "eslint": "^7.1.0",
         "eslint-config-airbnb": "^18.1.0",
