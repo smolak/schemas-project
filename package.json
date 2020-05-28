@@ -36,7 +36,8 @@
         "nock": "^12.0.3",
         "prettier": "^2.0.5",
         "sinon": "^9.0.2",
-        "sinon-chai": "^3.5.0"
+        "sinon-chai": "^3.5.0",
+        "tmp": "^0.2.1"
     },
     "dependencies": {
         "mkdirp": "^1.0.4",
