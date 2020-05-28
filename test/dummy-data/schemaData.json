@@ -1,0 +1,49 @@
+{
+    "schemas": {
+        "Thing": {
+            "children": [
+                "Action",
+                "CreativeWork",
+                "Person",
+                "Organization",
+                "Place",
+                "Intangible",
+                "Event",
+                "MedicalEntity",
+                "Product"
+            ],
+            "parents": [],
+            "specificityPaths": ["Thing"],
+            "properties": {
+                "all": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "disambiguatingDescription",
+                    "description"
+                ],
+                "own": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "disambiguatingDescription",
+                    "description"
+                ]
+            }
+        }
+    }
+}
