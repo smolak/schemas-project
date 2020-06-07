@@ -22,6 +22,7 @@ export const buildModules = ({ buildPath, schemaData }) => {
     };
     const createOwnPropertiesCode = (properties) =>
         properties.own
+            .sort()
             .reduce((code, propertyName) => {
                 return `${code}
     ${propertyName}: () => {},`;
