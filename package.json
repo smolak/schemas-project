@@ -6,10 +6,10 @@
     "scripts": {
         "build": "node -r esm ./src/index.js",
         "lint": "eslint ./src ./test",
-        "test": "mocha -r esm test/**/*.test.js",
-        "test:cgen:watch": "mocha -R min -w -r esm './test/e2e/code-generator/**/*.test.js'",
-        "test:unit": "mocha -r esm './test/unit/**/*.test.js'",
-        "test:unit:watch": "mocha -R min -w -r esm './test/unit/**/*.test.js'"
+        "test": "mocha -r esm --recursive 'test/**/*.test.js'",
+        "test:cgen:watch": "mocha -R min -w -r esm --recursive './test/e2e/code-generator/**/*.test.js'",
+        "test:unit": "mocha -r esm --recursive './test/unit/**/*.test.js'",
+        "test:unit:watch": "mocha -R min -w -r esm --recursive './test/unit/**/*.test.js'"
     },
     "author": "Jacek Smolak <jacek.smolak@gmail.com> (https://github.com/smolak)",
     "license": "MIT",
