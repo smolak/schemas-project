@@ -45,12 +45,8 @@ describe('buildModules', () => {
         expect(fileNames).to.have.members(expectedFileNames);
     });
 
-    describe('created modules', () => {
-        it('should be objects', () => {
-            const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-            buildModules({ buildPath, schemaData });
-
+    describe('built modules', () => {
+        const importBuiltModules = (buildPath) => {
             const modules = schemasInSchemaData.map(async (schemaName) => {
                 const fileName = `${schemaName}.js`;
                 const filePath = path.resolve(buildPath, fileName);
@@ -62,7 +58,15 @@ describe('buildModules', () => {
                 };
             });
 
-            return Promise.all(modules).then((resolvedModules) => {
+            return Promise.all(modules);
+        };
+
+        it('should be objects', () => {
+            const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+            buildModules({ buildPath, schemaData });
+
+            return importBuiltModules(buildPath).then((resolvedModules) => {
                 resolvedModules.forEach(({ module }) => {
                     expect(typeof module).to.equal('object');
                 });
@@ -74,18 +78,7 @@ describe('buildModules', () => {
 
             buildModules({ buildPath, schemaData });
 
-            const modules = schemasInSchemaData.map(async (schemaName) => {
-                const fileName = `${schemaName}.js`;
-                const filePath = path.resolve(buildPath, fileName);
-                const importedModule = await import(filePath);
-
-                return {
-                    module: importedModule.default,
-                    schemaName
-                };
-            });
-
-            return Promise.all(modules).then((resolvedModules) => {
+            return importBuiltModules(buildPath).then((resolvedModules) => {
                 resolvedModules.forEach(({ module, schemaName }) => {
                     const ownProperties = schemaData.schemas[schemaName].properties.own;
 
@@ -101,18 +94,7 @@ describe('buildModules', () => {
 
             buildModules({ buildPath, schemaData });
 
-            const modules = schemasInSchemaData.map(async (schemaName) => {
-                const fileName = `${schemaName}.js`;
-                const filePath = path.resolve(buildPath, fileName);
-                const importedModule = await import(filePath);
-
-                return {
-                    module: importedModule.default,
-                    schemaName
-                };
-            });
-
-            return Promise.all(modules).then((resolvedModules) => {
+            return importBuiltModules(buildPath).then((resolvedModules) => {
                 resolvedModules.forEach(({ module, schemaName }) => {
                     const properties = schemaData.schemas[schemaName].properties;
                     const ancestorProperties = properties.all.filter((property) => !properties.own.includes(property));
