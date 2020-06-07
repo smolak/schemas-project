@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { createModuleCode } from './codeTemplates';
+import { createFileName } from './utils';
 
 export const buildModules = ({ buildPath, schemaData }) => {
     try {
@@ -9,43 +11,6 @@ export const buildModules = ({ buildPath, schemaData }) => {
     }
 
     const schemaNames = Object.keys(schemaData.schemas);
-    const createFileName = (moduleName) => `${moduleName}.js`;
-    const isANumber = (character) => Number.isInteger(Number(character));
-    const ensureSchemaVariableNameIsSyntaxCompatible = (schemaName) => {
-        const firstCharacterIsANumber = isANumber(schemaName.charAt(0));
-
-        if (firstCharacterIsANumber) {
-            return `_${schemaName}`;
-        }
-
-        return schemaName;
-    };
-    const createOwnPropertiesCode = (properties) =>
-        properties.own
-            .sort()
-            .reduce((code, propertyName) => {
-                return `${code}
-    ${propertyName}: () => {},`;
-            }, '')
-            .trim();
-    const createAncestorModulesImportCode = (parentSchemaNames) =>
-        parentSchemaNames
-            .reduce((code, moduleName) => {
-                const syntaxCompatibleSchemaName = ensureSchemaVariableNameIsSyntaxCompatible(moduleName);
-
-                return `${code}
-import ${syntaxCompatibleSchemaName} from './${moduleName}';`;
-            }, '')
-            .trim();
-    const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
-        parentSchemaNames
-            .reduce((code, moduleName) => {
-                const syntaxCompatibleSchemaName = ensureSchemaVariableNameIsSyntaxCompatible(moduleName);
-
-                return `${code}
-    ...${syntaxCompatibleSchemaName},`;
-            }, '')
-            .trim();
 
     schemaNames.forEach(async (schemaName) => {
         const fileName = createFileName(schemaName);
@@ -56,20 +21,7 @@ import ${syntaxCompatibleSchemaName} from './${moduleName}';`;
             (propertiesGroupName) => propertiesGroupName !== 'all' && propertiesGroupName !== 'own'
         );
 
-        const ancestorModulesImportCode = createAncestorModulesImportCode(parentSchemaNames);
-        const schemaVariableName = ensureSchemaVariableNameIsSyntaxCompatible(schemaName);
-        const moduleBodyCode = `${
-            ancestorModulesImportCode ? createAncestorPropertiesInclusionCode(parentSchemaNames) : ''
-        }
-    ${createOwnPropertiesCode(properties)}`.trim();
-
-        const moduleCode = `${ancestorModulesImportCode}
-
-const ${schemaVariableName} = {
-    ${moduleBodyCode}
-}
-
-export default ${schemaVariableName};`.trim();
+        const moduleCode = createModuleCode({ schemaName, parentSchemaNames, properties });
 
         fs.writeFileSync(filePath, moduleCode);
     });
