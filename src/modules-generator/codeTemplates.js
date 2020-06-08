@@ -5,12 +5,18 @@ const createOwnPropertiesCode = (properties) =>
         .sort()
         .reduce((code, propertyName) => {
             return `${code}
-    ${propertyName}: () => 'itemprop="${propertyName}"',`;
+    ${propertyName}() { return this._itemprop('${propertyName}'); },`;
         }, '')
         .trim();
 
-const createAncestorModulesImportCode = (parentSchemaNames) =>
-    parentSchemaNames
+const createAncestorModulesImportCode = (schemaName, parentSchemaNames) => {
+    let baseModuleImportCode = '';
+
+    if (schemaName === 'Thing') {
+        baseModuleImportCode = "import _base from './_base.js';";
+    }
+
+    const ancestorModulesImportCode = parentSchemaNames
         .reduce((code, moduleName) => {
             const syntaxCompatibleSchemaName = ensureSchemaVariableNameIsSyntaxCompatible(moduleName);
 
@@ -18,6 +24,10 @@ const createAncestorModulesImportCode = (parentSchemaNames) =>
 import ${syntaxCompatibleSchemaName} from './${moduleName}';`;
         }, '')
         .trim();
+
+    return `${baseModuleImportCode}
+${ancestorModulesImportCode}`.trim();
+};
 
 const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
     parentSchemaNames
@@ -41,8 +51,9 @@ export default _base;`;
 
 export const createModuleCode = ({ schemaName, parentSchemaNames, properties }) => {
     const schemaVariableName = ensureSchemaVariableNameIsSyntaxCompatible(schemaName);
-    const ancestorModulesImportCode = createAncestorModulesImportCode(parentSchemaNames);
-    const moduleBodyCode = `${ancestorModulesImportCode ? createAncestorPropertiesInclusionCode(parentSchemaNames) : ''}
+    const ancestorModulesImportCode = createAncestorModulesImportCode(schemaName, parentSchemaNames);
+    const moduleBodyCode = `${schemaName === 'Thing' ? '..._base,' : ''}
+    ${ancestorModulesImportCode ? createAncestorPropertiesInclusionCode(parentSchemaNames) : ''}
     ${createOwnPropertiesCode(properties)}`.trim();
 
     return `${ancestorModulesImportCode}

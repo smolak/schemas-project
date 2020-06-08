@@ -42,7 +42,7 @@ describe('buildModules', () => {
         const fileNames = fs.readdirSync(buildPath);
         const expectedFileNames = schemasInSchemaData.map((schemaName) => `${schemaName}.js`);
 
-        expect(fileNames).to.have.members(expectedFileNames);
+        expect(fileNames).to.include.members(expectedFileNames);
     });
 
     describe('built modules', () => {
