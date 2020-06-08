@@ -29,6 +29,16 @@ const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
         }, '')
         .trim();
 
+export const createBaseModuleCode = () => {
+    return `const _base = {
+    _itemprop(propertyName) {
+        return \`itemprop="\${propertyName}"\`;
+    }    
+}    
+    
+export default _base;`;
+};
+
 export const createModuleCode = ({ schemaName, parentSchemaNames, properties }) => {
     const schemaVariableName = ensureSchemaVariableNameIsSyntaxCompatible(schemaName);
     const ancestorModulesImportCode = createAncestorModulesImportCode(parentSchemaNames);

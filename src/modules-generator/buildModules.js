@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { createModuleCode } from './codeTemplates';
+import { createModuleCode, createBaseModuleCode } from './codeTemplates';
 import { createFileName } from './utils';
 
 export const buildModules = ({ buildPath, schemaData }) => {
@@ -9,6 +9,9 @@ export const buildModules = ({ buildPath, schemaData }) => {
     } catch (_) {
         throw new Error('Build path is not accessible.');
     }
+
+    const baseModuleFilePath = path.resolve(buildPath, createFileName('_base'));
+    fs.writeFileSync(baseModuleFilePath, createBaseModuleCode());
 
     const schemaNames = Object.keys(schemaData.schemas);
 
