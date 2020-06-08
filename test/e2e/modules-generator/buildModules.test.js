@@ -105,5 +105,23 @@ describe('buildModules', () => {
                 });
             });
         });
+
+        describe('every property', () => {
+            it('should return itemprop for itself', () => {
+                const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                buildModules({ buildPath, schemaData });
+
+                return importBuiltModules(buildPath).then((resolvedModules) => {
+                    resolvedModules.forEach(({ module, schemaName }) => {
+                        const allProperties = schemaData.schemas[schemaName].properties.all;
+
+                        allProperties.forEach((propertyName) => {
+                            expect(module[propertyName]()).to.equal(`itemprop="${propertyName}"`);
+                        });
+                    });
+                });
+            });
+        });
     });
 });

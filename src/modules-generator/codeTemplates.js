@@ -5,7 +5,7 @@ const createOwnPropertiesCode = (properties) =>
         .sort()
         .reduce((code, propertyName) => {
             return `${code}
-    ${propertyName}: () => {},`;
+    ${propertyName}: () => 'itemprop="${propertyName}"',`;
         }, '')
         .trim();
 
