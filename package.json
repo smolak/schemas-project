@@ -33,7 +33,7 @@
         "eslint-plugin-react": "^7.20.0",
         "eslint-plugin-react-hooks": "^4.0.2",
         "esm": "^3.2.25",
-        "mocha": "^7.2.0",
+        "mocha": "^8.0.1",
         "nock": "^12.0.3",
         "prettier": "^2.0.5",
         "sinon": "^9.0.2",
