@@ -171,7 +171,7 @@ describe('parseSchemas', () => {
             expect(parsedSchemas[specificTypeSchemaLabel].children).to.include(schemaWithSpecificTypeLabel);
         });
 
-        describe('when there is more that one specific type', () => {
+        describe('when there is more than one specific type', () => {
             const schemaWithMoreThanOneSpecificType = {
                 '@id': 'http://schema.org/Radiography',
                 '@type': ['http://schema.org/MedicalSpecialty', 'http://schema.org/MedicalImagingTechnique'],
