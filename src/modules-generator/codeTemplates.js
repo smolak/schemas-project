@@ -5,7 +5,7 @@ const createOwnPropertiesCode = (properties) =>
         .sort()
         .reduce((code, propertyName) => {
             return `${code}
-    ${propertyName}() { return this._itemprop('${propertyName}'); },`;
+    ${propertyName}(value) { return this._itemprop('${propertyName}', value); },`;
         }, '')
         .trim();
 
@@ -40,9 +40,24 @@ const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
         .trim();
 
 export const createBaseModuleCode = () => {
-    return `const _base = {
-    _itemprop(propertyName) {
-        return \`itemprop="\${propertyName}"\`;
+    return `const escapeDoubleQuotes = (str) => {
+    return str.replace(/\\\\([\\s\\S])|(")/g, '\\\\$1$2');
+};
+
+const _base = {
+    _itemprop(propertyName, value) {
+        const itemprop = \`itemprop="\${propertyName}"\`;
+        let content = '';
+        
+        if (value) {
+            if (value.schemaName) {
+                content = \` itemscope itemtype="http://schema.org/\${value.schemaName}"\`;
+            } else {
+                content = \` content="\${escapeDoubleQuotes(value)}"\`;
+            }
+        }
+
+        return \`\${itemprop}\${content}\`;
     }    
 }    
     

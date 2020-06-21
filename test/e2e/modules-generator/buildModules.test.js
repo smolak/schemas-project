@@ -122,6 +122,68 @@ describe('buildModules', () => {
                     });
                 });
             });
+
+            describe('when called with a string value', () => {
+                it('should return that value in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const anyStringValue = 'I am some value';
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules(buildPath).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module, schemaName }) => {
+                            const allProperties = schemaData.schemas[schemaName].properties.all;
+
+                            allProperties.forEach((propertyName) => {
+                                expect(module[propertyName](anyStringValue)).to.contain(`content="${anyStringValue}"`);
+                            });
+                        });
+                    });
+                });
+
+                describe('when that string contains doublequotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                        const stringValueWithDoublequotes = 'I am "some" value';
+
+                        // prettier-ignore
+                        const expectedContent = 'content="I am \\"some\\" value"';
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules(buildPath).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module, schemaName }) => {
+                                const allProperties = schemaData.schemas[schemaName].properties.all;
+
+                                allProperties.forEach((propertyName) => {
+                                    expect(module[propertyName](stringValueWithDoublequotes)).to.contain(
+                                        expectedContent
+                                    );
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+            describe('when called with a schema class', () => {
+                it('should create a scope for that schema', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules(buildPath).then((resolvedModules) => {
+                        const PropertyValue = resolvedModules.find(({ schemaName }) => schemaName === 'PropertyValue');
+
+                        resolvedModules.forEach(({ module, schemaName }) => {
+                            const propertyThatCanCreateAScope = 'identifier';
+                            const result = module[propertyThatCanCreateAScope](PropertyValue);
+
+                            expect(result).to.contain('itemscope itemtype="http://schema.org/PropertyValue"');
+                        });
+                    });
+                });
+            });
         });
     });
 });
