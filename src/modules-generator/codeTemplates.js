@@ -50,7 +50,9 @@ const _base = {
         let content = '';
         
         if (value) {
-            if (value.schemaName) {
+            const isSchemaClass = Boolean(value.schemaName);
+        
+            if (isSchemaClass) {
                 content = \` itemscope itemtype="http://schema.org/\${value.schemaName}"\`;
             } else {
                 content = \` content="\${escapeDoubleQuotes(value)}"\`;
