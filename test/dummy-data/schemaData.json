@@ -2225,6 +2225,44 @@
                 "Intangible": [],
                 "Class": ["supersededBy"]
             }
+        },
+        "Class": {
+            "children": ["DataType"],
+            "parents": ["Intangible"],
+            "specificityPaths": ["Thing.Intangible.Class"],
+            "properties": {
+                "all": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "description",
+                    "disambiguatingDescription",
+                    "supersededBy"
+                ],
+                "own": ["supersededBy"],
+                "Thing": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "description",
+                    "disambiguatingDescription"
+                ],
+                "Intangible": []
+            }
         }
     }
 }
