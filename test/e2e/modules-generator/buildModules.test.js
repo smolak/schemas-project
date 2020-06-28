@@ -201,7 +201,7 @@ describe('buildModules', () => {
                     });
                 });
 
-                describe('when that schema is one of descendant of DataType', () => {
+                describe('when that schema is one of the descendants of DataType', () => {
                     it('should not allow that', () => {
                         const dataTypeDescendantsModuleNames = [
                             'False',
