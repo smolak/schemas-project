@@ -16,6 +16,7 @@
  - [ ] when all schemas and properties are parsed - perhaps create a tool ensuring that everything is well done, e.g.:
    1. Check if there is only one root schema (Thing)
    1. Check if every path on the specificityPaths begins with Thing and ends with given schema's label
+ - [ ] Make use of http://wiki.goodrelations-vocabulary.org/Documentation/UN/CEFACT_Common_Codes for https://schema.org/unitCode
 
 ### Schema builder class
 
