@@ -177,9 +177,13 @@ describe('buildModules', () => {
 
                         resolvedModules.forEach(({ module, schemaName }) => {
                             const propertyThatCanCreateAScope = 'identifier';
-                            const result = module[propertyThatCanCreateAScope](PropertyValue);
 
-                            expect(result).to.contain('itemscope itemtype="http://schema.org/PropertyValue"');
+                            // Not all schemas have properties, hence the check
+                            if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                                const result = module[propertyThatCanCreateAScope](PropertyValue);
+
+                                expect(result).to.contain('itemscope itemtype="http://schema.org/PropertyValue"');
+                            }
                         });
                     });
                 });
