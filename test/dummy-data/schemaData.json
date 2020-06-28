@@ -2343,5 +2343,11 @@
             "specificityPaths": [],
             "properties": { "all": [], "own": [] }
         }
+    },
+    "properties": {
+        "isAccessibleForFree": {
+            "usedIn": ["PublicationEvent", "CreativeWork", "Place", "Event"],
+            "valueTypes": ["Boolean"]
+        }
     }
 }
