@@ -4,6 +4,10 @@
 
  - [ ] Figure out what to do with `"http://schema.org/supersededBy"` on both Schemas and Properties
  - [ ] Figure out what to do with `"rdfs:subPropertyOf"` on Properties. Probably nothing, as a property, that is a subproperty of another, is being used in more specific schema. Semantically is similar, but for a more specific use case (schema) there is a more specific description (property).
+ - [ ] DataType
+   - this one is a bit tricky as it has Number, Text, ..., and those don't have properties nor can be used to create scope. Except for...
+   - children of [Text](https://schema.org/Text) which have their own properties, and because DataType doesn't include Thing, which includes _base ...
+   - I can't use the this._itemprop - probably I need to refactor it to import some kind of helper
 
 ## Ideas
 
