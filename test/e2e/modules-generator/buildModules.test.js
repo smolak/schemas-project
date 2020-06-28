@@ -92,7 +92,7 @@ describe('buildModules', () => {
             });
         });
 
-        describe('every property', () => {
+        describe('every property of built module', () => {
             it('should return itemprop for itself', () => {
                 const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
