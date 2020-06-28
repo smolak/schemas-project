@@ -44,6 +44,24 @@ export const createBaseModuleCode = () => {
     return str.replace(/\\\\([\\s\\S])|(")/g, '\\\\$1$2');
 };
 
+const throwIfCanNotCreateAScope = ({ schemaName }) => {
+    const dataTypeModuleNames = ['Boolean', 'Date', 'DateTime', 'Number', 'Text', 'Time'];
+    const dataTypeDescendantsModuleNames = [
+        'False',
+        'True',
+        'Float',
+        'Integer',
+        'CssSelectorType',
+        'PronounceableText',
+        'URL',
+        'XPathType'
+    ];
+    
+    if ([...dataTypeModuleNames, ...dataTypeDescendantsModuleNames].includes(schemaName)) {
+        throw new Error(\`Cant't create a scope using DataType schema (\${schemaName} used).\`);
+    }
+}
+
 const _base = {
     _itemprop(propertyName, value) {
         const itemprop = \`itemprop="\${propertyName}"\`;
@@ -53,6 +71,8 @@ const _base = {
             const isSchemaClass = Boolean(value.schemaName);
         
             if (isSchemaClass) {
+                throwIfCanNotCreateAScope(value);
+
                 content = \` itemscope itemtype="http://schema.org/\${value.schemaName}"\`;
             } else {
                 content = \` content="\${escapeDoubleQuotes(value)}"\`;

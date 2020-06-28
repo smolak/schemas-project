@@ -187,6 +187,69 @@ describe('buildModules', () => {
                         });
                     });
                 });
+
+                describe('when that schema is one of DataTypes', () => {
+                    it('should not allow that', () => {
+                        const dataTypeModuleNames = ['Boolean', 'Date', 'DateTime', 'Number', 'Text', 'Time'];
+                        const propertyThatCanCreateAScope = 'identifier';
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules(buildPath).then((resolvedModules) => {
+                            dataTypeModuleNames.forEach((dataTypeModuleName) => {
+                                const DataTypeModule = resolvedModules.find(
+                                    ({ schemaName }) => schemaName === dataTypeModuleName
+                                );
+
+                                resolvedModules.forEach(({ module }) => {
+                                    // Not all schemas have properties, hence the check
+                                    if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                                        expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
+                                            `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
+                                        );
+                                    }
+                                });
+                            });
+                        });
+                    });
+                });
+
+                describe('when that schema is one of descendant of DataType', () => {
+                    it('should not allow that', () => {
+                        const dataTypeDescendantsModuleNames = [
+                            'False',
+                            'True',
+                            'Float',
+                            'Integer',
+                            'CssSelectorType',
+                            'PronounceableText',
+                            'URL',
+                            'XPathType'
+                        ];
+                        const propertyThatCanCreateAScope = 'identifier';
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules(buildPath).then((resolvedModules) => {
+                            dataTypeDescendantsModuleNames.forEach((dataTypeModuleName) => {
+                                const DataTypeModule = resolvedModules.find(
+                                    ({ schemaName }) => schemaName === dataTypeModuleName
+                                );
+
+                                resolvedModules.forEach(({ module }) => {
+                                    // Not all schemas have properties, hence the check
+                                    if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                                        expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
+                                            `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
+                                        );
+                                    }
+                                });
+                            });
+                        });
+                    });
+                });
             });
         });
     });
