@@ -2263,6 +2263,85 @@
                 ],
                 "Intangible": []
             }
+        },
+        "Boolean": {
+            "children": ["True", "False"],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "True": {
+            "children": [],
+            "parents": ["Boolean"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "False": {
+            "children": [],
+            "parents": ["Boolean"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Date": {
+            "children": [],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "DateTime": {
+            "children": [],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Number": {
+            "children": ["Integer", "Float"],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Integer": {
+            "children": [],
+            "parents": ["Number"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Float": {
+            "children": [],
+            "parents": ["Number"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Text": {
+            "children": ["PronounceableText", "CssSelectorType", "URL", "XPathType"],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "CssSelectorType": {
+            "children": [],
+            "parents": ["Text"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "PronounceableText": {
+            "children": [],
+            "parents": ["Text"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": ["textValue", "phoneticText", "inLanguage", "speechToTextMarkup"] }
+        },
+        "URL": { "children": [], "parents": ["Text"], "specificityPaths": [], "properties": { "all": [], "own": [] } },
+        "XPathType": {
+            "children": [],
+            "parents": ["Text"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
+        },
+        "Time": {
+            "children": [],
+            "parents": ["DataType"],
+            "specificityPaths": [],
+            "properties": { "all": [], "own": [] }
         }
     }
 }
