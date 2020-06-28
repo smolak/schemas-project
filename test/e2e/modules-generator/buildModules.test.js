@@ -82,7 +82,7 @@ describe('buildModules', () => {
 
             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                 resolvedModules.forEach(({ module, schemaName }) => {
-                    const properties = schemaData.schemas[schemaName].properties;
+                    const { properties } = schemaData.schemas[schemaName];
                     const ancestorProperties = properties.all.filter((property) => !properties.own.includes(property));
 
                     ancestorProperties.forEach((propertyName) => {
@@ -161,11 +161,11 @@ describe('buildModules', () => {
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                         const PropertyValue = resolvedModules.find(({ schemaName }) => schemaName === 'PropertyValue');
 
-                        resolvedModules.forEach(({ module, schemaName }) => {
+                        resolvedModules.forEach(({ module }) => {
                             const propertyThatCanCreateAScope = 'identifier';
 
                             // Not all schemas have properties, hence the check
-                            if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                            if (module[propertyThatCanCreateAScope]) {
                                 const result = module[propertyThatCanCreateAScope](PropertyValue);
 
                                 expect(result).to.contain('itemscope itemtype="http://schema.org/PropertyValue"');
@@ -190,7 +190,7 @@ describe('buildModules', () => {
 
                                 resolvedModules.forEach(({ module }) => {
                                     // Not all schemas have properties, hence the check
-                                    if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                                    if (module[propertyThatCanCreateAScope]) {
                                         expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
                                             `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
                                         );
@@ -226,7 +226,7 @@ describe('buildModules', () => {
 
                                 resolvedModules.forEach(({ module }) => {
                                     // Not all schemas have properties, hence the check
-                                    if (module.hasOwnProperty(propertyThatCanCreateAScope)) {
+                                    if (module[propertyThatCanCreateAScope]) {
                                         expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
                                             `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
                                         );
