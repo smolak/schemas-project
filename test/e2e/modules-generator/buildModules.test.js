@@ -141,7 +141,7 @@ describe('buildModules', () => {
                     });
                 });
 
-                describe('when that string contains doublequotes', () => {
+                describe('when that string contains double quotes', () => {
                     it('should escape them', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
                         const stringValueWithDoublequotes = 'I am "some" value';
