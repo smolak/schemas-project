@@ -18,13 +18,13 @@ export const buildModules = ({ buildPath, schemaData }) => {
     schemaNames.forEach(async (schemaName) => {
         const fileName = createFileName(schemaName);
         const filePath = path.resolve(buildPath, fileName);
-        const { properties } = schemaData.schemas[schemaName];
+        const schemaProperties = schemaData.schemas[schemaName].properties;
 
-        const parentSchemaNames = Object.keys(properties).filter(
+        const parentSchemaNames = Object.keys(schemaProperties).filter(
             (propertiesGroupName) => propertiesGroupName !== 'all' && propertiesGroupName !== 'own'
         );
 
-        const moduleCode = createModuleCode({ schemaName, parentSchemaNames, properties });
+        const moduleCode = createModuleCode({ schemaName, parentSchemaNames, schemaProperties });
 
         fs.writeFileSync(filePath, moduleCode);
     });

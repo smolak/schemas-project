@@ -1,7 +1,7 @@
 import { ensureSchemaVariableNameIsSyntaxCompatible } from './utils';
 
-const createOwnPropertiesCode = (properties) =>
-    properties.own
+const createOwnPropertiesCode = (schemaProperties) =>
+    schemaProperties.own
         .sort()
         .reduce((code, propertyName) => {
             return `${code}
@@ -86,12 +86,12 @@ const _base = {
 export default _base;`;
 };
 
-export const createModuleCode = ({ schemaName, parentSchemaNames, properties }) => {
+export const createModuleCode = ({ schemaName, parentSchemaNames, schemaProperties }) => {
     const schemaVariableName = ensureSchemaVariableNameIsSyntaxCompatible(schemaName);
     const ancestorModulesImportCode = createAncestorModulesImportCode(schemaName, parentSchemaNames);
     const moduleBodyCode = `${schemaName === 'Thing' ? '..._base,' : ''}
     ${ancestorModulesImportCode ? createAncestorPropertiesInclusionCode(parentSchemaNames) : ''}
-    ${createOwnPropertiesCode(properties)}`.trim();
+    ${createOwnPropertiesCode(schemaProperties)}`.trim();
 
     return `${ancestorModulesImportCode}
 
