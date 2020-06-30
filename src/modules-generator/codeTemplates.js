@@ -1,11 +1,14 @@
 import { ensureSchemaVariableNameIsSyntaxCompatible } from './utils';
 
-const createOwnPropertiesCode = (schemaProperties) =>
+const createOwnPropertiesCode = (schemaProperties, allProperties) =>
     schemaProperties.own
         .sort()
         .reduce((code, propertyName) => {
+            const { valueTypes } = allProperties[propertyName];
+            const stringifiedValueTypes = valueTypes.map((valueType) => `'${valueType}'`).toString();
+
             return `${code}
-    ${propertyName}(value) { return this._itemprop('${propertyName}', value); },`;
+    ${propertyName}(value) { return this._itemprop('${propertyName}', value, [${stringifiedValueTypes}]); },`;
         }, '')
         .trim();
 
@@ -86,12 +89,12 @@ const _base = {
 export default _base;`;
 };
 
-export const createModuleCode = ({ schemaName, parentSchemaNames, schemaProperties }) => {
+export const createModuleCode = ({ schemaName, parentSchemaNames, schemaProperties, allProperties }) => {
     const schemaVariableName = ensureSchemaVariableNameIsSyntaxCompatible(schemaName);
     const ancestorModulesImportCode = createAncestorModulesImportCode(schemaName, parentSchemaNames);
     const moduleBodyCode = `${schemaName === 'Thing' ? '..._base,' : ''}
     ${ancestorModulesImportCode ? createAncestorPropertiesInclusionCode(parentSchemaNames) : ''}
-    ${createOwnPropertiesCode(schemaProperties)}`.trim();
+    ${createOwnPropertiesCode(schemaProperties, allProperties)}`.trim();
 
     return `${ancestorModulesImportCode}
 

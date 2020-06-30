@@ -11,6 +11,8 @@ export const buildModules = ({ buildPath, schemaData }) => {
     }
 
     const baseModuleFilePath = path.resolve(buildPath, createFileName('_base'));
+    const allProperties = schemaData.properties;
+
     fs.writeFileSync(baseModuleFilePath, createBaseModuleCode());
 
     const schemaNames = Object.keys(schemaData.schemas);
@@ -24,7 +26,7 @@ export const buildModules = ({ buildPath, schemaData }) => {
             (propertiesGroupName) => propertiesGroupName !== 'all' && propertiesGroupName !== 'own'
         );
 
-        const moduleCode = createModuleCode({ schemaName, parentSchemaNames, schemaProperties });
+        const moduleCode = createModuleCode({ schemaName, parentSchemaNames, schemaProperties, allProperties });
 
         fs.writeFileSync(filePath, moduleCode);
     });
