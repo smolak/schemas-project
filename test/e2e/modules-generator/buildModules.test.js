@@ -109,49 +109,6 @@ describe('buildModules', () => {
                 });
             });
 
-            describe('when called with a string value', () => {
-                it('should return that value in content attribute', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const anyStringValue = 'I am some value';
-
-                    buildModules({ buildPath, schemaData });
-
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module, schemaName }) => {
-                            const allProperties = schemaData.schemas[schemaName].properties.all;
-
-                            allProperties.forEach((propertyName) => {
-                                expect(module[propertyName](anyStringValue)).to.contain(`content="${anyStringValue}"`);
-                            });
-                        });
-                    });
-                });
-
-                describe('when that string contains double quotes', () => {
-                    it('should escape them', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const stringValueWithDoublequotes = 'I am "some" value';
-
-                        // prettier-ignore
-                        const expectedContent = 'content="I am \\"some\\" value"';
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module, schemaName }) => {
-                                const allProperties = schemaData.schemas[schemaName].properties.all;
-
-                                allProperties.forEach((propertyName) => {
-                                    expect(module[propertyName](stringValueWithDoublequotes)).to.contain(
-                                        expectedContent
-                                    );
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-
             describe('when called with a schema class', () => {
                 it('should create a scope for that schema', () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
@@ -237,6 +194,90 @@ describe('buildModules', () => {
                     });
                 });
             });
+        });
+
+        describe('valueTypes checking (types properties accept)', () => {
+            describe('Text value type', () => {
+                it('should return given value as is in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const propertyThatAcceptsTextValue = 'name';
+                    const textValue = 'I am some text value';
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            const moduleHasPropertyThatAcceptsTextValue = Boolean(module[propertyThatAcceptsTextValue]);
+
+                            if (moduleHasPropertyThatAcceptsTextValue) {
+                                expect(module[propertyThatAcceptsTextValue](textValue)).to.contain(
+                                    `content="I am some text value"`
+                                );
+                            }
+                        });
+                    });
+                });
+
+                describe('when that text value contains double quotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                        const propertyThatAcceptsTextValue = 'name';
+                        const textValueWithDoublequotes = 'I am "double quoted" text value';
+
+                        // prettier-ignore
+                        const expectedContent = 'content="I am \\"double quoted\\" text value"';
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                const moduleHasPropertyThatAcceptsTextValue = Boolean(
+                                    module[propertyThatAcceptsTextValue]
+                                );
+
+                                if (moduleHasPropertyThatAcceptsTextValue) {
+                                    expect(module[propertyThatAcceptsTextValue](textValueWithDoublequotes)).to.contain(
+                                        expectedContent
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
+            // describe('when property is accepting Boolean DataType value', () => {
+            //     it('should create itemprop and content with normalized Boolean value', () => {
+            //         const truthyBooleanValues = [true, 'true', 'True', 'TRUE'];
+            //         const falsyBooleanValues = [false, 'false', 'False', 'FALSE'];
+            //         const propertyThatTakesBooleanValue = 'isAccessibleForFree';
+            //         const buildPath = path.resolve(tempDir.name, testBuildFolder);
+            //
+            //         buildModules({ buildPath, schemaData });
+            //
+            //         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+            //             resolvedModules.forEach(({ module }) => {
+            //                 const moduleHasPropertyThatTakesBooleanValue = Boolean(
+            //                     module[propertyThatTakesBooleanValue]
+            //                 );
+            //
+            //                 if (moduleHasPropertyThatTakesBooleanValue) {
+            //                     truthyBooleanValues.forEach((booleanValue) => {
+            //                         expect(module[propertyThatTakesBooleanValue](booleanValue)).to.contain(
+            //                             `content="true"`
+            //                         );
+            //                     });
+            //
+            //                     falsyBooleanValues.forEach((booleanValue) => {
+            //                         expect(module[propertyThatTakesBooleanValue](booleanValue)).to.contain(
+            //                             `content="false"`
+            //                         );
+            //                     });
+            //                 }
+            //             });
+            //         });
+            //     });
+            // });
         });
     });
 });
