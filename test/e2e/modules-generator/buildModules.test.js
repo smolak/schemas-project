@@ -246,38 +246,27 @@ describe('buildModules', () => {
                 });
             });
 
-            // describe('when property is accepting Boolean DataType value', () => {
-            //     it('should create itemprop and content with normalized Boolean value', () => {
-            //         const truthyBooleanValues = [true, 'true', 'True', 'TRUE'];
-            //         const falsyBooleanValues = [false, 'false', 'False', 'FALSE'];
-            //         const propertyThatTakesBooleanValue = 'isAccessibleForFree';
-            //         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-            //
-            //         buildModules({ buildPath, schemaData });
-            //
-            //         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-            //             resolvedModules.forEach(({ module }) => {
-            //                 const moduleHasPropertyThatTakesBooleanValue = Boolean(
-            //                     module[propertyThatTakesBooleanValue]
-            //                 );
-            //
-            //                 if (moduleHasPropertyThatTakesBooleanValue) {
-            //                     truthyBooleanValues.forEach((booleanValue) => {
-            //                         expect(module[propertyThatTakesBooleanValue](booleanValue)).to.contain(
-            //                             `content="true"`
-            //                         );
-            //                     });
-            //
-            //                     falsyBooleanValues.forEach((booleanValue) => {
-            //                         expect(module[propertyThatTakesBooleanValue](booleanValue)).to.contain(
-            //                             `content="false"`
-            //                         );
-            //                     });
-            //                 }
-            //             });
-            //         });
-            //     });
-            // });
+            describe('Boolean value type', () => {
+                it('should return boolean value in content attribute', () => {
+                    const propertyThatTakesBooleanValue = 'isAccessibleForFree';
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            const moduleHasPropertyThatTakesBooleanValue = Boolean(
+                                module[propertyThatTakesBooleanValue]
+                            );
+
+                            if (moduleHasPropertyThatTakesBooleanValue) {
+                                expect(module[propertyThatTakesBooleanValue](true)).to.contain(`content="true"`);
+                                expect(module[propertyThatTakesBooleanValue](false)).to.contain(`content="false"`);
+                            }
+                        });
+                    });
+                });
+            });
         });
     });
 });

@@ -65,12 +65,16 @@ const throwIfCanNotCreateAScope = ({ schemaName }) => {
     }
 }
 
+const createBooleanValueContent = (booleanValue) => {
+    return booleanValue ? 'true' : 'false';
+}
+
 const _base = {
-    _itemprop(propertyName, value) {
+    _itemprop(propertyName, value, propertyValueTypes) {
         const itemprop = \`itemprop="\${propertyName}"\`;
         let content = '';
         
-        if (value) {
+        if (value !== undefined) {
             const isSchemaClass = Boolean(value.schemaName);
         
             if (isSchemaClass) {
@@ -78,7 +82,13 @@ const _base = {
 
                 content = \` itemscope itemtype="http://schema.org/\${value.schemaName}"\`;
             } else {
-                content = \` content="\${escapeDoubleQuotes(value)}"\`;
+                let contentValue = value;
+                
+                if (propertyValueTypes.includes('Boolean')) {
+                    contentValue = createBooleanValueContent(value);
+                }
+
+                content = \` content="\${escapeDoubleQuotes(contentValue)}"\`;
             }
         }
 
