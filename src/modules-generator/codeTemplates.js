@@ -42,11 +42,6 @@ const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
         }, '')
         .trim();
 
-export const createBaseModuleCode = () => {
-    return `const escapeDoubleQuotes = (str) => {
-    return str.replace(/\\\\([\\s\\S])|(")/g, '\\\\$1$2');
-};
-
 const throwIfCanNotCreateAScope = ({ schemaName }) => {
     const dataTypeModuleNames = ['Boolean', 'Date', 'DateTime', 'Number', 'Text', 'Time'];
     const dataTypeDescendantsModuleNames = [
@@ -59,41 +54,56 @@ const throwIfCanNotCreateAScope = ({ schemaName }) => {
         'URL',
         'XPathType'
     ];
-    
+
     if ([...dataTypeModuleNames, ...dataTypeDescendantsModuleNames].includes(schemaName)) {
-        throw new Error(\`Cant't create a scope using DataType schema (\${schemaName} used).\`);
+        throw new Error(`Cant't create a scope using DataType schema (${schemaName} used).`);
     }
-}
+};
 
 const createBooleanValueContent = (booleanValue) => {
     return booleanValue ? 'true' : 'false';
-}
+};
 
+const escapeDoubleQuotes = (string) => {
+    return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
+};
+
+/* eslint-disable no-underscore-dangle */
 const _base = {
     _itemprop(propertyName, value, propertyValueTypes) {
-        const itemprop = \`itemprop="\${propertyName}"\`;
+        const itemprop = `itemprop="${propertyName}"`;
         let content = '';
-        
+
         if (value !== undefined) {
             const isSchemaClass = Boolean(value.schemaName);
-        
+
             if (isSchemaClass) {
                 throwIfCanNotCreateAScope(value);
 
-                content = \` itemscope itemtype="http://schema.org/\${value.schemaName}"\`;
+                content = ` itemscope itemtype="http://schema.org/${value.schemaName}"`;
             } else {
                 let contentValue = value;
-                
+
                 if (propertyValueTypes.includes('Boolean')) {
                     contentValue = createBooleanValueContent(value);
                 }
 
-                content = \` content="\${escapeDoubleQuotes(contentValue)}"\`;
+                content = ` content="${escapeDoubleQuotes(contentValue)}"`;
             }
         }
 
-        return \`\${itemprop}\${content}\`;
-    }    
+        return `${itemprop}${content}`;
+    }
+};
+
+export const createBaseModuleCode = () => {
+    return `const escapeDoubleQuotes = ${escapeDoubleQuotes.toString()}
+
+const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
+const createBooleanValueContent = ${createBooleanValueContent.toString()}
+
+const _base = {
+    ${_base._itemprop.toString()}    
 }    
     
 export default _base;`;
