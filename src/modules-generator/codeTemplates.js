@@ -64,6 +64,12 @@ const createBooleanValueContent = (booleanValue) => {
     return booleanValue ? 'true' : 'false';
 };
 
+const throwIfNotBoolean = (value) => {
+    if (typeof value !== 'boolean') {
+        throw new Error('Boolean value type expected.');
+    }
+};
+
 const escapeDoubleQuotes = (string) => {
     return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
 };
@@ -85,6 +91,8 @@ const _base = {
                 let contentValue = value;
 
                 if (propertyValueTypes.includes('Boolean')) {
+                    throwIfNotBoolean(value);
+
                     contentValue = createBooleanValueContent(value);
                 }
 
@@ -100,6 +108,7 @@ export const createBaseModuleCode = () => {
     return `const escapeDoubleQuotes = ${escapeDoubleQuotes.toString()}
 
 const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
+const throwIfNotBoolean = ${throwIfNotBoolean.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {

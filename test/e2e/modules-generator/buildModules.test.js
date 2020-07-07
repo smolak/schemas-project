@@ -266,6 +266,29 @@ describe('buildModules', () => {
                         });
                     });
                 });
+
+                it('should not allow any other value than a boolean one', () => {
+                    const nonBooleanValue = 'a string';
+
+                    const propertyThatTakesBooleanValue = 'isAccessibleForFree';
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            const moduleHasPropertyThatTakesBooleanValue = Boolean(
+                                module[propertyThatTakesBooleanValue]
+                            );
+
+                            if (moduleHasPropertyThatTakesBooleanValue) {
+                                expect(() => module[propertyThatTakesBooleanValue](nonBooleanValue)).to.throw(
+                                    'Boolean value type expected.'
+                                );
+                            }
+                        });
+                    });
+                });
             });
         });
     });
