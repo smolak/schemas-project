@@ -198,18 +198,18 @@ describe('buildModules', () => {
 
         describe('valueTypes checking (types properties accept)', () => {
             describe('Text value type', () => {
+                const propertyThatAcceptsTextValue = 'name';
+                const moduleHasPropertyThatAcceptsTextValue = (module) => Boolean(module[propertyThatAcceptsTextValue]);
+
                 it('should return given value as is in content attribute', () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const propertyThatAcceptsTextValue = 'name';
                     const textValue = 'I am some text value';
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                         resolvedModules.forEach(({ module }) => {
-                            const moduleHasPropertyThatAcceptsTextValue = Boolean(module[propertyThatAcceptsTextValue]);
-
-                            if (moduleHasPropertyThatAcceptsTextValue) {
+                            if (moduleHasPropertyThatAcceptsTextValue(module)) {
                                 expect(module[propertyThatAcceptsTextValue](textValue)).to.contain(
                                     `content="I am some text value"`
                                 );
@@ -220,16 +220,13 @@ describe('buildModules', () => {
 
                 it('should not allow any other value than a text one', () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const propertyThatAcceptsTextValue = 'name';
                     const nonTextValue = true;
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                         resolvedModules.forEach(({ module }) => {
-                            const moduleHasPropertyThatAcceptsTextValue = Boolean(module[propertyThatAcceptsTextValue]);
-
-                            if (moduleHasPropertyThatAcceptsTextValue) {
+                            if (moduleHasPropertyThatAcceptsTextValue(module)) {
                                 expect(() => module[propertyThatAcceptsTextValue](nonTextValue)).to.throw(
                                     'Text value type expected.'
                                 );
@@ -241,7 +238,6 @@ describe('buildModules', () => {
                 describe('when that text value contains double quotes', () => {
                     it('should escape them', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const propertyThatAcceptsTextValue = 'name';
                         const textValueWithDoublequotes = 'I am "double quoted" text value';
 
                         // prettier-ignore
@@ -251,11 +247,7 @@ describe('buildModules', () => {
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                             resolvedModules.forEach(({ module }) => {
-                                const moduleHasPropertyThatAcceptsTextValue = Boolean(
-                                    module[propertyThatAcceptsTextValue]
-                                );
-
-                                if (moduleHasPropertyThatAcceptsTextValue) {
+                                if (moduleHasPropertyThatAcceptsTextValue(module)) {
                                     expect(module[propertyThatAcceptsTextValue](textValueWithDoublequotes)).to.contain(
                                         expectedContent
                                     );
