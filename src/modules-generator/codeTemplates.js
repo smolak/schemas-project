@@ -76,6 +76,12 @@ const throwIfNotBoolean = (value) => {
     }
 };
 
+const throwIfNotDate = (value) => {
+    if (isNaN(Date.parse(value))) {
+        throw new Error('Date type value expected.');
+    }
+};
+
 const escapeDoubleQuotes = (string) => {
     return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
 };
@@ -106,6 +112,23 @@ const _base = {
                     contentValue = createBooleanValueContent(value);
                 }
 
+                if (propertyValueTypes.includes('Date')) {
+                    throwIfNotDate(value);
+
+                    if (value instanceof Date) {
+                        contentValue = value.toISOString();
+                    } else {
+                        const hoursAndMinutesSeparator = ':';
+                        const isDatetime = value.includes(hoursAndMinutesSeparator);
+
+                        if (isDatetime) {
+                            const date = new Date(value);
+
+                            contentValue = date.toISOString();
+                        }
+                    }
+                }
+
                 content = ` content="${escapeDoubleQuotes(contentValue)}"`;
             }
         }
@@ -120,6 +143,7 @@ export const createBaseModuleCode = () => {
 const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
 const throwIfNotText = ${throwIfNotText.toString()}
 const throwIfNotBoolean = ${throwIfNotBoolean.toString()}
+const throwIfNotDate = ${throwIfNotDate.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {
