@@ -247,19 +247,18 @@ describe('buildModules', () => {
             });
 
             describe('Boolean value type', () => {
+                const propertyThatTakesBooleanValue = 'isAccessibleForFree';
+                const moduleHasPropertyThatTakesBooleanValue = (module) =>
+                    Boolean(module[propertyThatTakesBooleanValue]);
+
                 it('should return boolean value in content attribute', () => {
-                    const propertyThatTakesBooleanValue = 'isAccessibleForFree';
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                         resolvedModules.forEach(({ module }) => {
-                            const moduleHasPropertyThatTakesBooleanValue = Boolean(
-                                module[propertyThatTakesBooleanValue]
-                            );
-
-                            if (moduleHasPropertyThatTakesBooleanValue) {
+                            if (moduleHasPropertyThatTakesBooleanValue(module)) {
                                 expect(module[propertyThatTakesBooleanValue](true)).to.contain(`content="true"`);
                                 expect(module[propertyThatTakesBooleanValue](false)).to.contain(`content="false"`);
                             }
@@ -269,19 +268,13 @@ describe('buildModules', () => {
 
                 it('should not allow any other value than a boolean one', () => {
                     const nonBooleanValue = 'a string';
-
-                    const propertyThatTakesBooleanValue = 'isAccessibleForFree';
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                         resolvedModules.forEach(({ module }) => {
-                            const moduleHasPropertyThatTakesBooleanValue = Boolean(
-                                module[propertyThatTakesBooleanValue]
-                            );
-
-                            if (moduleHasPropertyThatTakesBooleanValue) {
+                            if (moduleHasPropertyThatTakesBooleanValue(module)) {
                                 expect(() => module[propertyThatTakesBooleanValue](nonBooleanValue)).to.throw(
                                     'Boolean value type expected.'
                                 );
