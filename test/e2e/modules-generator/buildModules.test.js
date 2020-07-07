@@ -218,6 +218,26 @@ describe('buildModules', () => {
                     });
                 });
 
+                it('should not allow any other value than a text one', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const propertyThatAcceptsTextValue = 'name';
+                    const nonTextValue = true;
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            const moduleHasPropertyThatAcceptsTextValue = Boolean(module[propertyThatAcceptsTextValue]);
+
+                            if (moduleHasPropertyThatAcceptsTextValue) {
+                                expect(() => module[propertyThatAcceptsTextValue](nonTextValue)).to.throw(
+                                    'Text value type expected.'
+                                );
+                            }
+                        });
+                    });
+                });
+
                 describe('when that text value contains double quotes', () => {
                     it('should escape them', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
