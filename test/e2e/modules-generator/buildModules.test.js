@@ -328,8 +328,32 @@ describe('buildModules', () => {
                     });
                 });
 
+                describe('when value is an instance of Date', () => {
+                    it('should return date in minus separated format in content attribute honoring UTC', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesDateValue(module)) {
+                                    const date1 = new Date('2020-01-01');
+                                    const date2 = new Date('2020-01-01 00:00:00');
+
+                                    expect(module[propertyThatTakesDateValue](date1)).to.contain(
+                                        `content="2020-01-01"`
+                                    );
+                                    expect(module[propertyThatTakesDateValue](date2)).to.contain(
+                                        `content="2019-12-31"`
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+
                 describe('when value is a valid, datetime string', () => {
-                    it('should return that value in ISO format in content attribute', () => {
+                    it('should return date in minus separated format in content attribute honoring UTC', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                         buildModules({ buildPath, schemaData });
@@ -338,16 +362,16 @@ describe('buildModules', () => {
                             resolvedModules.forEach(({ module }) => {
                                 if (moduleHasPropertyThatTakesDateValue(module)) {
                                     expect(module[propertyThatTakesDateValue]('2020 14:15')).to.contain(
-                                        `content="2020-01-01T13:15:00.000Z"`
+                                        `content="2020-01-01"`
                                     );
                                     expect(module[propertyThatTakesDateValue]('2020-02 14:15')).to.contain(
-                                        `content="2020-02-01T13:15:00.000Z"`
+                                        `content="2020-02-01"`
                                     );
                                     expect(module[propertyThatTakesDateValue]('2020-02-23 14:15')).to.contain(
-                                        `content="2020-02-23T13:15:00.000Z"`
+                                        `content="2020-02-23"`
                                     );
                                     expect(module[propertyThatTakesDateValue]('2020-02-23 14:15:16')).to.contain(
-                                        `content="2020-02-23T13:15:16.000Z"`
+                                        `content="2020-02-23"`
                                     );
                                 }
                             });
@@ -355,27 +379,7 @@ describe('buildModules', () => {
                     });
                 });
 
-                describe('when value is an instance of Date', () => {
-                    it('should return that date in ISO format in content attribute', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    const date = new Date('2020-02-23 14:15:16');
-
-                                    expect(module[propertyThatTakesDateValue](date)).to.contain(
-                                        `content="2020-02-23T13:15:16.000Z"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is not a valid date(time) string or Date instance', () => {
+                describe('when value is not a valid date string or Date instance', () => {
                     it('should not allow such a value', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
 

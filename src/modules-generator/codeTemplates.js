@@ -116,7 +116,9 @@ const _base = {
                     throwIfNotDate(value);
 
                     if (value instanceof Date) {
-                        contentValue = value.toISOString();
+                        const [utcDate] = value.toISOString().split('T');
+
+                        contentValue = utcDate;
                     } else {
                         const hoursAndMinutesSeparator = ':';
                         const isDatetime = value.includes(hoursAndMinutesSeparator);
@@ -124,7 +126,9 @@ const _base = {
                         if (isDatetime) {
                             const date = new Date(value);
 
-                            contentValue = date.toISOString();
+                            const [utcDate] = date.toISOString().split('T');
+
+                            contentValue = utcDate;
                         }
                     }
                 }
