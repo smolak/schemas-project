@@ -77,7 +77,7 @@ const throwIfNotBoolean = (value) => {
 };
 
 const throwIfNotDate = (value) => {
-    if (isNaN(Date.parse(value))) {
+    if (Number.isNaN(Date.parse(value))) {
         throw new Error('Date type value expected.');
     }
 };
