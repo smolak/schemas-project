@@ -337,15 +337,9 @@ describe('buildModules', () => {
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
                             resolvedModules.forEach(({ module }) => {
                                 if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    const date1 = new Date('2020-01-01');
-                                    const date2 = new Date('2020-01-01 00:00:00');
+                                    const date = new Date(Date.UTC(2020, 0, 1));
 
-                                    expect(module[propertyThatTakesDateValue](date1)).to.contain(
-                                        `content="2020-01-01"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue](date2)).to.contain(
-                                        `content="2019-12-31"`
-                                    );
+                                    expect(module[propertyThatTakesDateValue](date)).to.contain(`content="2020-01-01"`);
                                 }
                             });
                         });
