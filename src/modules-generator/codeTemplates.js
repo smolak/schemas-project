@@ -124,9 +124,7 @@ const _base = {
                         const isDatetime = value.includes(hoursAndMinutesSeparator);
 
                         if (isDatetime) {
-                            const date = new Date(value);
-
-                            const [utcDate] = date.toISOString().split('T');
+                            const [utcDate] = new Date(value).toISOString().split('T');
 
                             contentValue = utcDate;
                         }
@@ -136,9 +134,7 @@ const _base = {
                 if (propertyValueTypes.includes('DateTime')) {
                     throwIfNotDate(value, 'DateTime type value expected.');
 
-                    const date = new Date(value);
-
-                    contentValue = date.toISOString();
+                    contentValue = new Date(value).toISOString();
                 }
 
                 content = ` content="${escapeDoubleQuotes(contentValue)}"`;
