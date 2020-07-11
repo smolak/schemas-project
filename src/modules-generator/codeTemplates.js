@@ -76,9 +76,9 @@ const throwIfNotBoolean = (value) => {
     }
 };
 
-const throwIfNotDate = (value) => {
+const throwIfNotDate = (value, errorMessage) => {
     if (Number.isNaN(Date.parse(value))) {
-        throw new Error('Date type value expected.');
+        throw new Error(errorMessage);
     }
 };
 
@@ -113,7 +113,7 @@ const _base = {
                 }
 
                 if (propertyValueTypes.includes('Date')) {
-                    throwIfNotDate(value);
+                    throwIfNotDate(value, 'Date type value expected.');
 
                     if (value instanceof Date) {
                         const [utcDate] = value.toISOString().split('T');
@@ -131,6 +131,14 @@ const _base = {
                             contentValue = utcDate;
                         }
                     }
+                }
+
+                if (propertyValueTypes.includes('DateTime')) {
+                    throwIfNotDate(value, 'DateTime type value expected.');
+
+                    const date = new Date(value);
+
+                    contentValue = date.toISOString();
                 }
 
                 content = ` content="${escapeDoubleQuotes(contentValue)}"`;
