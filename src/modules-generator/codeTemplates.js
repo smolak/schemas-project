@@ -64,25 +64,25 @@ const createBooleanValueContent = (booleanValue) => {
     return booleanValue ? 'true' : 'false';
 };
 
-const throwIfNotText = (value) => {
+const throwIfNotAText = (value) => {
     if (typeof value !== 'string') {
         throw new Error('Text value type expected.');
     }
 };
 
-const throwIfNotBoolean = (value) => {
+const throwIfNotABoolean = (value) => {
     if (typeof value !== 'boolean') {
         throw new Error('Boolean value type expected.');
     }
 };
 
-const throwIfNotDate = (value, errorMessage) => {
+const throwIfNotADate = (value, errorMessage) => {
     if (Number.isNaN(Date.parse(value))) {
         throw new Error(errorMessage);
     }
 };
 
-const throwIfNotNumber = (value) => {
+const throwIfNotANumber = (value) => {
     if (typeof value !== 'number') {
         throw new Error('Number type value expected.');
     }
@@ -109,17 +109,17 @@ const _base = {
                 let contentValue = value;
 
                 if (propertyValueTypes.includes('Text')) {
-                    throwIfNotText(value);
+                    throwIfNotAText(value);
                 }
 
                 if (propertyValueTypes.includes('Boolean')) {
-                    throwIfNotBoolean(value);
+                    throwIfNotABoolean(value);
 
                     contentValue = createBooleanValueContent(value);
                 }
 
                 if (propertyValueTypes.includes('Date')) {
-                    throwIfNotDate(value, 'Date type value expected.');
+                    throwIfNotADate(value, 'Date type value expected.');
 
                     if (value instanceof Date) {
                         const [utcDate] = value.toISOString().split('T');
@@ -138,13 +138,13 @@ const _base = {
                 }
 
                 if (propertyValueTypes.includes('DateTime')) {
-                    throwIfNotDate(value, 'DateTime type value expected.');
+                    throwIfNotADate(value, 'DateTime type value expected.');
 
                     contentValue = new Date(value).toISOString();
                 }
 
                 if (propertyValueTypes.includes('Number')) {
-                    throwIfNotNumber(value);
+                    throwIfNotANumber(value);
 
                     contentValue = `${value}`;
                 }
@@ -161,10 +161,10 @@ export const createBaseModuleCode = () => {
     return `const escapeDoubleQuotes = ${escapeDoubleQuotes.toString()}
 
 const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
-const throwIfNotText = ${throwIfNotText.toString()}
-const throwIfNotBoolean = ${throwIfNotBoolean.toString()}
-const throwIfNotDate = ${throwIfNotDate.toString()}
-const throwIfNotNumber = ${throwIfNotNumber.toString()}
+const throwIfNotAText = ${throwIfNotAText.toString()}
+const throwIfNotABoolean = ${throwIfNotABoolean.toString()}
+const throwIfNotADate = ${throwIfNotADate.toString()}
+const throwIfNotANumber = ${throwIfNotANumber.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {
