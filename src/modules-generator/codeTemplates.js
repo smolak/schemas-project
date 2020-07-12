@@ -82,6 +82,12 @@ const throwIfNotDate = (value, errorMessage) => {
     }
 };
 
+const throwIfNotNumber = (value) => {
+    if (typeof value !== 'number') {
+        throw new Error('Number type value expected.');
+    }
+};
+
 const escapeDoubleQuotes = (string) => {
     return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
 };
@@ -137,6 +143,12 @@ const _base = {
                     contentValue = new Date(value).toISOString();
                 }
 
+                if (propertyValueTypes.includes('Number')) {
+                    throwIfNotNumber(value);
+
+                    contentValue = `${value}`;
+                }
+
                 content = ` content="${escapeDoubleQuotes(contentValue)}"`;
             }
         }
@@ -152,6 +164,7 @@ const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
 const throwIfNotText = ${throwIfNotText.toString()}
 const throwIfNotBoolean = ${throwIfNotBoolean.toString()}
 const throwIfNotDate = ${throwIfNotDate.toString()}
+const throwIfNotNumber = ${throwIfNotNumber.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {

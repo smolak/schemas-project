@@ -474,6 +474,48 @@ describe('buildModules', () => {
                     });
                 });
             });
+
+            describe('Number data type', () => {
+                const propertyThatTakesNumberValue = 'maxValue';
+                const moduleHasPropertyThatTakesNumberValue = (module) => Boolean(module[propertyThatTakesNumberValue]);
+
+                it('should return number in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatTakesNumberValue(module)) {
+                                expect(module[propertyThatTakesNumberValue](42)).to.contain(`content="42"`);
+                                expect(module[propertyThatTakesNumberValue](Math.PI)).to.contain(
+                                    `content="${Math.PI}"`
+                                );
+                            }
+                        });
+                    });
+                });
+
+                describe('when value is not a number', () => {
+                    it('should not allow such a value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesNumberValue(module)) {
+                                    const notANumber = 'foo';
+
+                                    expect(() => module[propertyThatTakesNumberValue](notANumber)).to.throw(
+                                        'Number type value expected.'
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+            });
         });
     });
 });
