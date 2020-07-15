@@ -2187,6 +2187,49 @@
                 "Intangible": []
             }
         },
+        "OpeningHoursSpecification": {
+            "children": [],
+            "parents": ["StructuredValue"],
+            "specificityPaths": ["Thing.Intangible.StructuredValue.OpeningHoursSpecification"],
+            "properties": {
+                "all": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "description",
+                    "disambiguatingDescription",
+                    "validFrom",
+                    "validThrough",
+                    "opens",
+                    "closes",
+                    "dayOfWeek"
+                ],
+                "own": ["validFrom", "validThrough", "opens", "closes", "dayOfWeek"],
+                "Thing": [
+                    "sameAs",
+                    "url",
+                    "alternateName",
+                    "image",
+                    "additionalType",
+                    "name",
+                    "identifier",
+                    "subjectOf",
+                    "potentialAction",
+                    "mainEntityOfPage",
+                    "description",
+                    "disambiguatingDescription"
+                ],
+                "Intangible": [],
+                "StructuredValue": []
+            }
+        },
         "DataType": {
             "children": [],
             "parents": ["Class"],
