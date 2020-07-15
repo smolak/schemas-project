@@ -83,7 +83,10 @@ const throwIfNotADate = (value, errorMessage) => {
 };
 
 const throwIfNotANumber = (value) => {
-    if (typeof value !== 'number') {
+    const isNotANumber = typeof value !== 'number';
+    const isAnInfiniteNumber = !Number.isFinite(value);
+
+    if (isNotANumber || isAnInfiniteNumber) {
         throw new Error('Number type value expected.');
     }
 };

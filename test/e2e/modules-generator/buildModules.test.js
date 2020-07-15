@@ -515,6 +515,27 @@ describe('buildModules', () => {
                         });
                     });
                 });
+
+                describe('when value is an infinite number', () => {
+                    it('should not allow such a value as numbers are stringified', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesNumberValue(module)) {
+                                    expect(() => module[propertyThatTakesNumberValue](Infinity)).to.throw(
+                                        'Number type value expected.'
+                                    );
+                                    expect(() => module[propertyThatTakesNumberValue](-Infinity)).to.throw(
+                                        'Number type value expected.'
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
             });
 
             describe('Integer data type', () => {
