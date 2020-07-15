@@ -23,12 +23,14 @@
  - [ ] split downloaded data to schemas and properties
  - [ ] introduce models for schemas and properties so that getters will create instances of given models on the fly
  - [x] add isSchema isProperty helper functions, as I check this here and there (have it defined in one place)
- - [ ] right now, the property methods return value in `content` attribute. Reverse that - return it as is, and if passed additional parameter, `attribute`, return it in that attribute. For example:
+ - [ ] right now, the property methods return value in `content` attribute. Have `content` be the default attribute, but if a different one is passed explicitly, as a second argument, then that one is used. For example:
+   
+   ```js
+   OpeningHoursSpecification.validFrom('2020-01-01'); // `itemprop="validFrom" content="2020-01-01"`
+   OpeningHoursSpecification.validFrom('2020-01-01', 'datetime'); // `itemprop="validFrom" datetime="2020-01-01"`
+   ``` 
        
-       ```js
-       Place.name('A cool place.'); // `A cool place.`
-       Place.name('A cool place.', 'content'); // `content="A cool place."`
-       ```
+   The reason is that for some values, native HTML attributes are a correct place to put them.
 
 ### API usages [WIP]
 
