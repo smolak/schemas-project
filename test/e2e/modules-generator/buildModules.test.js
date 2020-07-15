@@ -516,6 +516,46 @@ describe('buildModules', () => {
                     });
                 });
             });
+
+            describe('Integer data type', () => {
+                const propertyThatTakesIntegerValue = 'commentCount';
+                const moduleHasPropertyThatTakesIntegerValue = (module) =>
+                    Boolean(module[propertyThatTakesIntegerValue]);
+
+                it('should return integer number in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatTakesIntegerValue(module)) {
+                                expect(module[propertyThatTakesIntegerValue](42)).to.contain(`content="42"`);
+                            }
+                        });
+                    });
+                });
+
+                describe('when value is not an integer', () => {
+                    it('should not allow such a value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesIntegerValue(module)) {
+                                    const notAnInteger = Math.PI;
+
+                                    expect(() => module[propertyThatTakesIntegerValue](notAnInteger)).to.throw(
+                                        'Integer type value expected.'
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+            });
         });
     });
 });

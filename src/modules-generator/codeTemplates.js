@@ -88,6 +88,12 @@ const throwIfNotANumber = (value) => {
     }
 };
 
+const throwIfNotAnInteger = (value) => {
+    if (!Number.isInteger(value)) {
+        throw new Error('Integer type value expected.');
+    }
+};
+
 const escapeDoubleQuotes = (string) => {
     return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
 };
@@ -149,6 +155,12 @@ const _base = {
                     contentValue = `${value}`;
                 }
 
+                if (propertyValueTypes.includes('Integer')) {
+                    throwIfNotAnInteger(value);
+
+                    contentValue = `${value}`;
+                }
+
                 content = ` content="${escapeDoubleQuotes(contentValue)}"`;
             }
         }
@@ -165,6 +177,7 @@ const throwIfNotAText = ${throwIfNotAText.toString()}
 const throwIfNotABoolean = ${throwIfNotABoolean.toString()}
 const throwIfNotADate = ${throwIfNotADate.toString()}
 const throwIfNotANumber = ${throwIfNotANumber.toString()}
+const throwIfNotAnInteger = ${throwIfNotAnInteger.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {
