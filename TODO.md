@@ -23,6 +23,12 @@
  - [ ] split downloaded data to schemas and properties
  - [ ] introduce models for schemas and properties so that getters will create instances of given models on the fly
  - [x] add isSchema isProperty helper functions, as I check this here and there (have it defined in one place)
+ - [ ] right now, the property methods return value in `content` attribute. Reverse that - return it as is, and if passed additional parameter, `attribute`, return it in that attribute. For example:
+       
+       ```js
+       Place.name('A cool place.'); // `A cool place.`
+       Place.name('A cool place.', 'content'); // `content="A cool place."`
+       ```
 
 ### API usages [WIP]
 
