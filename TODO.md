@@ -31,6 +31,7 @@
    ``` 
        
    The reason is that for some values, native HTML attributes are a correct place to put them.
+ - [ ] Add test helper that verifies that the whole generated string consist of `itemprop="${itemprop}" content="${value}"`, and not just that it includes the `content="${value}"`.
 
 ### API usages [WIP]
 
