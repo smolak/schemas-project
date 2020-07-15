@@ -475,6 +475,72 @@ describe('buildModules', () => {
                 });
             });
 
+            describe('Time data type', () => {
+                const propertyThatTakesTimeValue = 'opens';
+                const moduleHasPropertyThatTakesTimeValue = (module) => Boolean(module[propertyThatTakesTimeValue]);
+
+                describe('when value is a valid, datetime string', () => {
+                    it('should return datetime in ISO format honoring UTC', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesTimeValue(module)) {
+                                    expect(module[propertyThatTakesTimeValue]('14:15')).to.contain(`content="14:15"`);
+                                    expect(module[propertyThatTakesTimeValue]('14:15:16')).to.contain(
+                                        `content="14:15:16"`
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+
+                describe('when value is an instance of Date', () => {
+                    it('should return time in colon separated format in content attribute honoring UTC', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesTimeValue(module)) {
+                                    const date = new Date('2020-01-01 01:02:03');
+
+                                    expect(module[propertyThatTakesTimeValue](date)).to.contain(`content="01:02:03"`);
+                                }
+                            });
+                        });
+                    });
+                });
+
+                describe('when value is not a valid time string or Date instance', () => {
+                    it('should not allow such a value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatTakesTimeValue(module)) {
+                                    const notADatetimeLikeString = 'foo';
+                                    const notADateInstanceObject = new URL('http://example.com');
+
+                                    expect(() => module[propertyThatTakesTimeValue](notADatetimeLikeString)).to.throw(
+                                        'Time type value expected.'
+                                    );
+                                    expect(() => module[propertyThatTakesTimeValue](notADateInstanceObject)).to.throw(
+                                        'Time type value expected.'
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
             describe('Number data type', () => {
                 const propertyThatTakesNumberValue = 'maxValue';
                 const moduleHasPropertyThatTakesNumberValue = (module) => Boolean(module[propertyThatTakesNumberValue]);

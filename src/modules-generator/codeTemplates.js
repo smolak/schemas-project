@@ -82,6 +82,25 @@ const throwIfNotADate = (value, errorMessage) => {
     }
 };
 
+const throwIfNotATimeOrADate = (value) => {
+    let throwAnError = false;
+
+    if (typeof value === 'string') {
+        const anyValidDate = '2020-01-01';
+        const dateTimeString = `${anyValidDate} ${value}`;
+
+        if (Number.isNaN(Date.parse(dateTimeString))) {
+            throwAnError = true;
+        }
+    } else if (!(value instanceof Date)) {
+        throwAnError = true;
+    }
+
+    if (throwAnError) {
+        throw new Error('Time type value expected.');
+    }
+};
+
 const throwIfNotANumber = (value) => {
     const isNotANumber = typeof value !== 'number';
     const isAnInfiniteNumber = !Number.isFinite(value);
@@ -152,6 +171,19 @@ const _base = {
                     contentValue = new Date(value).toISOString();
                 }
 
+                if (propertyValueTypes.includes('Time')) {
+                    throwIfNotATimeOrADate(value);
+
+                    if (value instanceof Date) {
+                        const [, utcTime] = value.toISOString().split('T');
+                        const [plainTime] = utcTime.split('.');
+
+                        contentValue = plainTime;
+                    } else {
+                        contentValue = value;
+                    }
+                }
+
                 if (propertyValueTypes.includes('Number')) {
                     throwIfNotANumber(value);
 
@@ -179,6 +211,7 @@ const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
 const throwIfNotAText = ${throwIfNotAText.toString()}
 const throwIfNotABoolean = ${throwIfNotABoolean.toString()}
 const throwIfNotADate = ${throwIfNotADate.toString()}
+const throwIfNotATimeOrADate = ${throwIfNotATimeOrADate.toString()}
 const throwIfNotANumber = ${throwIfNotANumber.toString()}
 const throwIfNotAnInteger = ${throwIfNotAnInteger.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
