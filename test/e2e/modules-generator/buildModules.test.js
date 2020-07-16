@@ -258,6 +258,68 @@ describe('buildModules', () => {
                 });
             });
 
+            describe('CssSelectorType value type, which is a more specific Text-like value', () => {
+                const propertyThatAcceptsCssSelectorTypeValue = 'cssSelector';
+                const moduleHasPropertyThatAcceptsCssSelectorTypeValue = (module) =>
+                    Boolean(module[propertyThatAcceptsCssSelectorTypeValue]);
+
+                it('should return given value as is in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const cssSelectorTypeValue = '.title';
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
+                                expect(
+                                    module[propertyThatAcceptsCssSelectorTypeValue](cssSelectorTypeValue)
+                                ).to.contain(`content=".title"`);
+                            }
+                        });
+                    });
+                });
+
+                it('should not allow any other value than a text one', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const nonCssSelectorTypeValue = true;
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
+                                expect(() =>
+                                    module[propertyThatAcceptsCssSelectorTypeValue](nonCssSelectorTypeValue)
+                                ).to.throw('CssSelectorType value type expected.');
+                            }
+                        });
+                    });
+                });
+
+                describe('when value contains double quotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                        const textValueWithDoublequotes = 'a[href="https://example.com"]';
+
+                        // prettier-ignore
+                        const expectedContent = 'content="a[href=\\"https://example.com\\"]"';
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
+                                    expect(
+                                        module[propertyThatAcceptsCssSelectorTypeValue](textValueWithDoublequotes)
+                                    ).to.contain(expectedContent);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
             describe('Boolean value type', () => {
                 const propertyThatTakesBooleanValue = 'isAccessibleForFree';
                 const moduleHasPropertyThatTakesBooleanValue = (module) =>

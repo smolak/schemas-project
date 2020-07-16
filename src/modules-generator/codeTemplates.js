@@ -64,9 +64,9 @@ const createBooleanValueContent = (booleanValue) => {
     return booleanValue ? 'true' : 'false';
 };
 
-const throwIfNotAText = (value) => {
+const throwIfNotAText = (value, errorMessage) => {
     if (typeof value !== 'string') {
-        throw new Error('Text value type expected.');
+        throw new Error(errorMessage);
     }
 };
 
@@ -137,7 +137,11 @@ const _base = {
                 let contentValue = value;
 
                 if (propertyValueTypes.includes('Text')) {
-                    throwIfNotAText(value);
+                    throwIfNotAText(value, 'Text value type expected.');
+                }
+
+                if (propertyValueTypes.includes('CssSelectorType')) {
+                    throwIfNotAText(value, 'CssSelectorType value type expected.');
                 }
 
                 if (propertyValueTypes.includes('Boolean')) {
