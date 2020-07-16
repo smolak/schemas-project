@@ -64,7 +64,7 @@ const createBooleanValueContent = (booleanValue) => {
     return booleanValue ? 'true' : 'false';
 };
 
-const throwIfNotAText = (value, errorMessage) => {
+const throwIfNotAString = (value, errorMessage) => {
     if (typeof value !== 'string') {
         throw new Error(errorMessage);
     }
@@ -146,15 +146,15 @@ const _base = {
                 let contentValue = value;
 
                 if (propertyValueTypes.includes('Text')) {
-                    throwIfNotAText(value, 'Text value type expected.');
+                    throwIfNotAString(value, 'Text value type expected.');
                 }
 
                 if (propertyValueTypes.includes('CssSelectorType')) {
-                    throwIfNotAText(value, 'CssSelectorType value type expected.');
+                    throwIfNotAString(value, 'CssSelectorType value type expected.');
                 }
 
                 if (propertyValueTypes.includes('XPathType')) {
-                    throwIfNotAText(value, 'XPathType value type expected.');
+                    throwIfNotAString(value, 'XPathType value type expected.');
                 }
 
                 if (propertyValueTypes.includes('URL')) {
@@ -229,7 +229,7 @@ export const createBaseModuleCode = () => {
     return `const escapeDoubleQuotes = ${escapeDoubleQuotes.toString()}
 
 const throwIfCanNotCreateAScope = ${throwIfCanNotCreateAScope.toString()}
-const throwIfNotAText = ${throwIfNotAText.toString()}
+const throwIfNotAString = ${throwIfNotAString.toString()}
 const throwIfNotABoolean = ${throwIfNotABoolean.toString()}
 const throwIfNotADate = ${throwIfNotADate.toString()}
 const throwIfNotATimeOrADate = ${throwIfNotATimeOrADate.toString()}
