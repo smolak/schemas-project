@@ -32,6 +32,7 @@
        
    The reason is that for some values, native HTML attributes are a correct place to put them.
  - [ ] Add test helper that verifies that the whole generated string consist of `itemprop="${itemprop}" content="${value}"`, and not just that it includes the `content="${value}"`.
+ - [ ] Use [node-css-selector-parser](https://www.npmjs.com/package/css-selector-parser) for CssSelectorType value type - as a peer dependency?
 
 ### API usages [WIP]
 
