@@ -116,9 +116,9 @@ const throwIfNotAnInteger = (value) => {
     }
 };
 
+/* eslint-disable no-new */
 const throwIfNotAURL = (value) => {
     try {
-        // eslint-disable-next-line no-new
         new URL(value);
     } catch (_) {
         throw new Error('URL value type expected.');
