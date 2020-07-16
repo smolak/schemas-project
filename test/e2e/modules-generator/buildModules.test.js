@@ -705,6 +705,73 @@ describe('buildModules', () => {
                     });
                 });
             });
+
+            describe('URL value type', () => {
+                const propertyThatAcceptsURLValue = 'sameAs';
+                const moduleHasPropertyThatAcceptsURLValue = (module) => Boolean(module[propertyThatAcceptsURLValue]);
+
+                it('should return given value as is in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const urlValue = 'http://example.com';
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsURLValue(module)) {
+                                expect(module[propertyThatAcceptsURLValue](urlValue)).to.contain(
+                                    `content="http://example.com"`
+                                );
+                            }
+                        });
+                    });
+                });
+
+                it('should not allow any other value than a URL one', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const nonURLValueExamples = ['a', true, 42];
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsURLValue(module)) {
+                                nonURLValueExamples.forEach((nonURLValue) => {
+                                    expect(() => module[propertyThatAcceptsURLValue](nonURLValue)).to.throw(
+                                        'URL value type expected.'
+                                    );
+                                });
+                            }
+                        });
+                    });
+                });
+
+                describe('when that text value contains double quotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                        const urlValueWithDoublequotes = 'http://example.com/?query="Shall this pass?"';
+
+                        // prettier-ignore
+                        const expectedContent = 'http://example.com/?query=\\"Shall this pass?\\"';
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatAcceptsURLValue(module)) {
+                                    expect(module[propertyThatAcceptsURLValue](urlValueWithDoublequotes)).to.contain(
+                                        expectedContent
+                                    );
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
+            describe.skip('PronounceableText value type', () => {
+                // Not used yet.
+            });
         });
     });
 });

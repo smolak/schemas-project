@@ -116,6 +116,15 @@ const throwIfNotAnInteger = (value) => {
     }
 };
 
+const throwIfNotAURL = (value) => {
+    try {
+        // eslint-disable-next-line no-new
+        new URL(value);
+    } catch (_) {
+        throw new Error('URL value type expected.');
+    }
+};
+
 const escapeDoubleQuotes = (string) => {
     return string.replace(/\\([\s\S])|(")/g, '\\$1$2');
 };
@@ -142,6 +151,10 @@ const _base = {
 
                 if (propertyValueTypes.includes('CssSelectorType')) {
                     throwIfNotAText(value, 'CssSelectorType value type expected.');
+                }
+
+                if (propertyValueTypes.includes('URL')) {
+                    throwIfNotAURL(value);
                 }
 
                 if (propertyValueTypes.includes('Boolean')) {
@@ -218,6 +231,7 @@ const throwIfNotADate = ${throwIfNotADate.toString()}
 const throwIfNotATimeOrADate = ${throwIfNotATimeOrADate.toString()}
 const throwIfNotANumber = ${throwIfNotANumber.toString()}
 const throwIfNotAnInteger = ${throwIfNotAnInteger.toString()}
+const throwIfNotAURL = ${throwIfNotAURL.toString()}
 const createBooleanValueContent = ${createBooleanValueContent.toString()}
 
 const _base = {
