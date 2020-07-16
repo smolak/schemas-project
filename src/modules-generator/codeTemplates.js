@@ -153,6 +153,10 @@ const _base = {
                     throwIfNotAText(value, 'CssSelectorType value type expected.');
                 }
 
+                if (propertyValueTypes.includes('XPathType')) {
+                    throwIfNotAText(value, 'XPathType value type expected.');
+                }
+
                 if (propertyValueTypes.includes('URL')) {
                     throwIfNotAURL(value);
                 }

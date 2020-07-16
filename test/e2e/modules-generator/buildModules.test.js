@@ -769,6 +769,70 @@ describe('buildModules', () => {
                 });
             });
 
+            describe('XPathType value type', () => {
+                const propertyThatAcceptsXPathTypeValue = 'xpath';
+                const moduleHasPropertyThatAcceptsXPathTypeValue = (module) =>
+                    Boolean(module[propertyThatAcceptsXPathTypeValue]);
+
+                it('should return given value as is in content attribute', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const xPathValue = '/some/path';
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
+                                expect(module[propertyThatAcceptsXPathTypeValue](xPathValue)).to.contain(
+                                    `content="/some/path"`
+                                );
+                            }
+                        });
+                    });
+                });
+
+                it('should not allow any other value than an XPathType one (string checking at the moment)', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                    const nonStringValueExamples = [true, 42];
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        resolvedModules.forEach(({ module }) => {
+                            if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
+                                nonStringValueExamples.forEach((nonStringValue) => {
+                                    expect(() => module[propertyThatAcceptsXPathTypeValue](nonStringValue)).to.throw(
+                                        'XPathType value type expected.'
+                                    );
+                                });
+                            }
+                        });
+                    });
+                });
+
+                describe('when that text value contains double quotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+                        const urlValueWithDoublequotes = 'http://example.com/?query="Shall this pass?"';
+
+                        // prettier-ignore
+                        const expectedContent = 'http://example.com/?query=\\"Shall this pass?\\"';
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            resolvedModules.forEach(({ module }) => {
+                                if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
+                                    expect(
+                                        module[propertyThatAcceptsXPathTypeValue](urlValueWithDoublequotes)
+                                    ).to.contain(expectedContent);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
             describe.skip('PronounceableText value type', () => {
                 // Not used yet.
             });
