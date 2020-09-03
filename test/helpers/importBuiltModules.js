@@ -7,10 +7,7 @@ export const importBuiltModules = ({ buildPath, schemaData }) => {
         const filePath = path.resolve(buildPath, fileName);
         const importedModule = await import(filePath);
 
-        return {
-            module: importedModule.default,
-            schemaName
-        };
+        return importedModule.default;
     });
 
     return Promise.all(modules);
