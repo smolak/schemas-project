@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 const buildAllLayersDataUrl = (schemaVersion) => {
-    return `https://raw.githubusercontent.com/schemaorg/schemaorg/master/data/releases/${schemaVersion}/all-layers.jsonld`;
+    return `https://raw.githubusercontent.com/schemaorg/schemaorg/main/data/releases/${schemaVersion}/all-layers.jsonld`;
 };
 const allLayersDataFetcher = (schemaVersion) =>
     fetch(buildAllLayersDataUrl(schemaVersion))
