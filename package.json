@@ -7,7 +7,6 @@
         "build": "node -r esm ./src/index.js",
         "lint": "eslint ./src ./test",
         "test": "export TZ=UTC; mocha -r esm --recursive 'test/**/*.test.js'",
-        "test:cgen:watch": "export TZ=UTC; mocha -R min -w -r esm --recursive 'test/e2e/modules-generator/**/*.test.js'",
         "test:unit": "export TZ=UTC; mocha -r esm --recursive './test/unit/**/*.test.js'",
         "test:unit:watch": "export TZ=UTC; mocha -R min -w -r esm --recursive './test/unit/**/*.test.js'"
     },
