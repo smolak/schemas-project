@@ -1,16 +1,20 @@
 import fetch from 'node-fetch';
 
-const CONFIG_FILE_URL = 'https://raw.githubusercontent.com/schemaorg/schemaorg/master/versions.json';
+const CONFIG_FILE_URL = 'https://raw.githubusercontent.com/schemaorg/schemaorg/main/versions.json';
 
 const versionDataFetcher = () =>
     fetch(CONFIG_FILE_URL)
         .then((res) => res.json())
-        .then((data) => {
-            return {
-                schemaVersionNumber: data.schemaversion
-            };
-        });
+        .then((data) => data);
 
 export const fetchLatestSchemaVersionNumber = (fetchVersionData = versionDataFetcher) => {
-    return fetchVersionData().then(({ schemaVersionNumber }) => schemaVersionNumber);
+    return fetchVersionData().then(({ releaseLog }) => {
+        const now = new Date();
+        const entries = Object.entries(releaseLog);
+        const [versionNumber] = entries.find(([, releaseDate]) => {
+            return now >= new Date(releaseDate);
+        });
+
+        return versionNumber;
+    });
 };

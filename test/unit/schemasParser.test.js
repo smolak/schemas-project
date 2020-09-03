@@ -171,7 +171,7 @@ describe('parseSchemas', () => {
             expect(parsedSchemas[specificTypeSchemaLabel].children).to.include(schemaWithSpecificTypeLabel);
         });
 
-        describe('when there is more that one specific type', () => {
+        describe('when there is more than one specific type', () => {
             const schemaWithMoreThanOneSpecificType = {
                 '@id': 'http://schema.org/Radiography',
                 '@type': ['http://schema.org/MedicalSpecialty', 'http://schema.org/MedicalImagingTechnique'],
@@ -215,23 +215,6 @@ describe('parseSchemas', () => {
                 expect(parsedSchemas.MedicalSpecialty.children).to.include('Radiography');
                 expect(parsedSchemas.MedicalImagingTechnique.children).to.include('Radiography');
             });
-        });
-    });
-
-    describe('when schema has a type of DataType (besides a generic rdfs:Class)', () => {
-        const schemaWithDataTypeType = {
-            '@id': 'http://schema.org/Date',
-            '@type': ['rdfs:Class', 'http://schema.org/DataType'],
-            'rdfs:label': 'Date'
-        };
-
-        it('should add DataType to its `parents` property', () => {
-            const schemaLabel = extractLabelFromSchema(schemaWithDataTypeType);
-            const schemas = [schemaWithDataTypeType];
-
-            const parsedSchemas = parseSchemas(schemas);
-
-            expect(parsedSchemas[schemaLabel].parents).to.contain('DataType');
         });
     });
 

@@ -5,19 +5,30 @@ import mkdirp from 'mkdirp';
 import { SchemasBuilder } from './SchemasBuilder';
 import { fetchAllLayersData } from './fetchAllLayersData';
 import { fetchLatestSchemaVersionNumber } from './fetchLatestSchemaVersionNumber';
+import { buildModules } from './modules-generator/buildModules';
 
 const buildFolderPath = path.resolve(__dirname, '../build');
+const schemaDataFolderPath = path.resolve(buildFolderPath, 'schemaData');
+const modulesFolderPath = path.resolve(buildFolderPath, 'modules');
 const schemaDataFilename = 'schemaData.json';
 
-const createBuildFolder = () => mkdirp(buildFolderPath);
+const createFolder = (folderPath) => mkdirp(folderPath);
+const createBuildFolder = () => {
+    createFolder(buildFolderPath);
+    createFolder(schemaDataFolderPath);
+    createFolder(modulesFolderPath);
+};
 const removeBuildFolder = () => rimraf.sync(buildFolderPath);
+
+// eslint-disable-next-line
+const logMessage = (message) => console.info(message);
 
 const run = async () => {
     await removeBuildFolder();
-    console.info('Removed build folder.');
+    logMessage('Removed build folder.');
 
     await createBuildFolder();
-    console.info('Created build folder.');
+    logMessage('Created build folder.');
 
     const schemasBuilder = new SchemasBuilder({
         latestVersionNumberFetcher: fetchLatestSchemaVersionNumber,
@@ -25,24 +36,28 @@ const run = async () => {
     });
 
     await schemasBuilder.fetchLatestSchemaVersionNumber();
-    console.info(`Schema version fetched: ${schemasBuilder.latestSchemaVersion}.`);
+    logMessage(`Schema version fetched: ${schemasBuilder.latestSchemaVersion}.`);
 
     await schemasBuilder.fetchSchemasData();
-    console.info('Schema data fetched.');
+    logMessage('Schema data fetched.');
 
     schemasBuilder.parseDownloadedData();
-    console.info('Schema data parsed.');
+    logMessage('Schema data parsed.');
 
     const data = schemasBuilder.combineParsedData();
-    console.info('Schema data combined.');
+    logMessage('Schema data combined.');
 
-    const filePath = path.resolve(buildFolderPath, schemaDataFilename);
+    const schemaDataFilePath = path.resolve(schemaDataFolderPath, schemaDataFilename);
 
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(schemaDataFilePath, JSON.stringify(data));
+    logMessage('Schema data file built.');
 
-    console.info('Schema data built.');
+    logMessage('Building modules...');
+    buildModules({ buildPath: modulesFolderPath, schemaData: data });
+    logMessage('Done building modules.');
 };
 
 run()
-    .then(() => console.info('Finished.'))
+    .then(() => logMessage('All finished 🎉'))
+    // eslint-disable-next-line
     .catch(console.error);

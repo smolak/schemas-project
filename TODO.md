@@ -4,6 +4,10 @@
 
  - [ ] Figure out what to do with `"http://schema.org/supersededBy"` on both Schemas and Properties
  - [ ] Figure out what to do with `"rdfs:subPropertyOf"` on Properties. Probably nothing, as a property, that is a subproperty of another, is being used in more specific schema. Semantically is similar, but for a more specific use case (schema) there is a more specific description (property).
+ - [ ] DataType
+   - this one is a bit tricky as it has Number, Text, ..., and those don't have properties nor can be used to create scope. Except for...
+   - children of [Text](https://schema.org/Text) which have their own properties, and because DataType doesn't include Thing, which includes _base ...
+   - I can't use the this._itemprop - probably I need to refactor it to import some kind of helper
 
 ## Ideas
 
@@ -12,12 +16,23 @@
  - [ ] when all schemas and properties are parsed - perhaps create a tool ensuring that everything is well done, e.g.:
    1. Check if there is only one root schema (Thing)
    1. Check if every path on the specificityPaths begins with Thing and ends with given schema's label
+ - [ ] Make use of http://wiki.goodrelations-vocabulary.org/Documentation/UN/CEFACT_Common_Codes for https://schema.org/unitCode
 
 ### Schema builder class
 
  - [ ] split downloaded data to schemas and properties
  - [ ] introduce models for schemas and properties so that getters will create instances of given models on the fly
  - [x] add isSchema isProperty helper functions, as I check this here and there (have it defined in one place)
+ - [ ] right now, the property methods return value in `content` attribute. Have `content` be the default attribute, but if a different one is passed explicitly, as a second argument, then that one is used. For example:
+   
+   ```js
+   OpeningHoursSpecification.validFrom('2020-01-01'); // `itemprop="validFrom" content="2020-01-01"`
+   OpeningHoursSpecification.validFrom('2020-01-01', 'datetime'); // `itemprop="validFrom" datetime="2020-01-01"`
+   ``` 
+       
+   The reason is that for some values, native HTML attributes are a correct place to put them.
+ - [ ] Add test helper that verifies that the whole generated string consist of `itemprop="${itemprop}" content="${value}"`, and not just that it includes the `content="${value}"`.
+ - [ ] Use [node-css-selector-parser](https://www.npmjs.com/package/css-selector-parser) for CssSelectorType value type - as a peer dependency?
 
 ### API usages [WIP]
 

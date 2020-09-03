@@ -13,12 +13,13 @@
         },
         "sourceType": "module"
     },
-    "plugins": ["chai-friendly", "prettier", "react"],
+    "plugins": ["chai-friendly", "prettier", "react", "import"],
     "rules": {
         "no-unused-expressions": 0,
         "chai-friendly/no-unused-expressions": 2,
         "prettier/prettier": "error",
         "import/no-default-export": "error",
-        "import/prefer-default-export": "off"
+        "import/prefer-default-export": "off",
+        "import/named": 0
     }
 }

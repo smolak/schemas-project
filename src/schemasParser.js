@@ -43,19 +43,18 @@ const addSpecificityPathsForSchema = (schemaDataStructures, schemaLabel) => {
 };
 
 const buildSpecificityPaths = (schemaDataStructures) => {
-    const rootSchema = Object.entries(schemaDataStructures)
+    Object.entries(schemaDataStructures)
         .map((entry) => {
             return { label: entry[0], parents: entry[1].parents };
         })
-        .find((item) => item.parents.length === 0);
+        .filter((item) => item.parents.length === 0)
+        .forEach((rootSchema) => {
+            const rootSchemaLabel = rootSchema.label;
 
-    if (rootSchema) {
-        const rootSchemaLabel = rootSchema.label;
+            schemaDataStructures[rootSchemaLabel].specificityPaths.push(rootSchemaLabel);
 
-        schemaDataStructures[rootSchemaLabel].specificityPaths.push(rootSchemaLabel);
-
-        addSpecificityPathsForSchema(schemaDataStructures, rootSchemaLabel);
-    }
+            addSpecificityPathsForSchema(schemaDataStructures, rootSchemaLabel);
+        });
 };
 
 export const parseSchemas = (schemas) => {
@@ -82,9 +81,9 @@ export const parseSchemas = (schemas) => {
         const isOfDataType = hasDataType(schema);
         const isOfSpecificTypeOrTypes = hasSpecificTypeOrTypes(schema);
 
-        if (isOfSpecificTypeOrTypes && !isOfDataType) {
+        if (isOfSpecificTypeOrTypes) {
             const specificTypes = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
-            const specificTypesLabels = specificTypes.map(extractLabelFromSchemaType);
+            const specificTypesLabels = specificTypes.map(extractLabelFromSchemaType).filter(Boolean);
 
             specificTypesLabels.forEach((specificTypeLabel) => {
                 addParent(schemaDataStructures, schemaLabel, specificTypeLabel);
@@ -92,7 +91,7 @@ export const parseSchemas = (schemas) => {
             });
         }
 
-        if (schemaSubClass) {
+        if (schemaSubClass && schemaLabel && schemaLabel !== 'DataType') {
             const subClassData = Array.isArray(schemaSubClass) ? schemaSubClass : [schemaSubClass];
 
             subClassData.forEach((subClass) => {
