@@ -6,8 +6,8 @@ import { fetchAllLayersData } from '../../src/fetchAllLayersData';
 describe('fetchAllLayersData function', () => {
     describe('when all layers data is fetched successfully', () => {
         it('should return that data', async () => {
-            const schemaVersion = '7.01';
-            const workingAllLayersDataFetcher = () =>
+            const schemaVersion = '10.0';
+            const allLayersDataFetcherStub = () =>
                 Promise.resolve({
                     rawSchemaData: [
                         {
@@ -19,7 +19,7 @@ describe('fetchAllLayersData function', () => {
                     ]
                 });
 
-            const dataFetched = await fetchAllLayersData(schemaVersion, workingAllLayersDataFetcher);
+            const dataFetched = await fetchAllLayersData(schemaVersion, allLayersDataFetcherStub);
 
             expect(dataFetched).to.deep.equal([
                 {
