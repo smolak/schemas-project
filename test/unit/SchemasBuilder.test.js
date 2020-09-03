@@ -382,12 +382,23 @@ describe('SchemasBuilder class', () => {
                     'rdfs:label': 'url'
                 }
             ];
-            const textSchemaRequiredForPropertiesUsage = {
-                '@id': 'http://schema.org/Text',
-                '@type': ['http://schema.org/DataType', 'rdfs:Class'],
-                'rdfs:comment': 'Data type: Text.',
-                'rdfs:label': 'Text'
-            };
+            const textSchemaAndItsParentRequiredForPropertiesUsage = [
+                {
+                    '@id': 'http://schema.org/DataType',
+                    '@type': 'rdfs:Class',
+                    'rdfs:comment': 'The basic data types such as Integers, Strings, etc.',
+                    'rdfs:label': 'DataType',
+                    'rdfs:subClassOf': {
+                        '@id': 'rdfs:Class'
+                    }
+                },
+                {
+                    '@id': 'http://schema.org/Text',
+                    '@type': ['http://schema.org/DataType', 'rdfs:Class'],
+                    'rdfs:comment': 'Data type: Text.',
+                    'rdfs:label': 'Text'
+                }
+            ];
             const downloadedSchemasData = [
                 {
                     '@id': 'http://schema.org/Thing',
@@ -404,7 +415,7 @@ describe('SchemasBuilder class', () => {
                     }
                 },
                 ...propertiesDedicatedForActionSchema,
-                textSchemaRequiredForPropertiesUsage
+                ...textSchemaAndItsParentRequiredForPropertiesUsage
             ];
 
             const schemasBuilder = new SchemasBuilder({
