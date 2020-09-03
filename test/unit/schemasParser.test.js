@@ -218,23 +218,6 @@ describe('parseSchemas', () => {
         });
     });
 
-    describe('when schema has a type of DataType (besides a generic rdfs:Class)', () => {
-        const schemaWithDataTypeType = {
-            '@id': 'http://schema.org/Date',
-            '@type': ['rdfs:Class', 'http://schema.org/DataType'],
-            'rdfs:label': 'Date'
-        };
-
-        it('should add DataType to its `parents` property', () => {
-            const schemaLabel = extractLabelFromSchema(schemaWithDataTypeType);
-            const schemas = [schemaWithDataTypeType];
-
-            const parsedSchemas = parseSchemas(schemas);
-
-            expect(parsedSchemas[schemaLabel].parents).to.contain('DataType');
-        });
-    });
-
     describe('specificityPath', () => {
         describe('when given schema has no parents (is a root schema)', () => {
             it('should have only itself on the specificity path', () => {

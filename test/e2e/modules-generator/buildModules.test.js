@@ -34,6 +34,8 @@ describe('buildModules', () => {
         });
     });
 
+    const getSchemaName = ({ _schemaName }) => _schemaName;
+
     it('should create modules named after Schemas coming from schema data', () => {
         const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
@@ -53,8 +55,8 @@ describe('buildModules', () => {
             buildModules({ buildPath, schemaData });
 
             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                resolvedModules.forEach(({ module }) => {
-                    expect(typeof module).to.equal('object');
+                resolvedModules.forEach((Schema) => {
+                    expect(typeof Schema).to.equal('object');
                 });
             });
         });
@@ -65,11 +67,12 @@ describe('buildModules', () => {
             buildModules({ buildPath, schemaData });
 
             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                resolvedModules.forEach(({ module, schemaName }) => {
+                resolvedModules.forEach((Schema) => {
+                    const schemaName = getSchemaName(Schema);
                     const ownProperties = schemaData.schemas[schemaName].properties.own;
 
                     ownProperties.forEach((propertyName) => {
-                        expect(typeof module[propertyName]).to.equal('function');
+                        expect(typeof Schema[propertyName]).to.equal('function');
                     });
                 });
             });
@@ -81,25 +84,27 @@ describe('buildModules', () => {
             buildModules({ buildPath, schemaData });
 
             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                resolvedModules.forEach(({ module, schemaName }) => {
+                resolvedModules.forEach((Schema) => {
+                    const schemaName = getSchemaName(Schema);
                     const { properties } = schemaData.schemas[schemaName];
                     const ancestorProperties = properties.all.filter((property) => !properties.own.includes(property));
 
                     ancestorProperties.forEach((propertyName) => {
-                        expect(typeof module[propertyName]).to.equal('function');
+                        expect(typeof Schema[propertyName]).to.equal('function');
                     });
                 });
             });
         });
 
-        describe('every property of built module', () => {
-            it('should return itemprop for itself', () => {
+        describe('every property of built Schema module', () => {
+            it('should return itemprop for self', () => {
                 const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                 buildModules({ buildPath, schemaData });
 
                 return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                    resolvedModules.forEach(({ module, schemaName }) => {
+                    resolvedModules.forEach((module) => {
+                        const schemaName = getSchemaName(module);
                         const allProperties = schemaData.schemas[schemaName].properties.all;
 
                         allProperties.forEach((propertyName) => {
@@ -109,732 +114,715 @@ describe('buildModules', () => {
                 });
             });
 
-            describe('when called with a schema class', () => {
-                it('should create a scope for that schema', () => {
+            describe('when called with a Schema module', () => {
+                it('should create a scope for that Schema', () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const PropertyValue = resolvedModules.find(({ schemaName }) => schemaName === 'PropertyValue');
+                        const PropertyValue = resolvedModules.find(
+                            (module) => getSchemaName(module) === 'PropertyValue'
+                        );
 
-                        resolvedModules.forEach(({ module }) => {
+                        resolvedModules.forEach((Schema) => {
                             const propertyThatCanCreateAScope = 'identifier';
 
                             // Not all schemas have properties, hence the check
                             if (module[propertyThatCanCreateAScope]) {
-                                const result = module[propertyThatCanCreateAScope](PropertyValue);
+                                const result = Schema.identifier(PropertyValue);
 
                                 expect(result).to.contain('itemscope itemtype="http://schema.org/PropertyValue"');
                             }
                         });
                     });
                 });
+            });
 
-                describe('when that schema is one of DataTypes', () => {
-                    it('should not allow that', () => {
-                        const dataTypeModuleNames = ['Boolean', 'Date', 'DateTime', 'Number', 'Text', 'Time'];
-                        const propertyThatCanCreateAScope = 'identifier';
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+            describe('when called with a Schema that is not accepted as a value', () => {
+                it('should not allow to call it with that Schema', () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
-                        buildModules({ buildPath, schemaData });
+                    buildModules({ buildPath, schemaData });
 
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            dataTypeModuleNames.forEach((dataTypeModuleName) => {
-                                const DataTypeModule = resolvedModules.find(
-                                    ({ schemaName }) => schemaName === dataTypeModuleName
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        const LocalBusiness = resolvedModules.find(
+                            (module) => getSchemaName(module) === 'LocalBusiness'
+                        );
+
+                        resolvedModules.forEach((module) => {
+                            const propertyThatDoesNotAcceptLocalBusinessAsValue = 'name';
+                            const valueTypesForName = schemaData.properties.name.valueTypes;
+
+                            // Not all schemas have properties, hence the check
+                            if (module[propertyThatDoesNotAcceptLocalBusinessAsValue]) {
+                                expect(() => module.name(LocalBusiness)).to.throw(
+                                    `'LocalBusiness' can't be used as value for 'name' property. 'name' accepts only: '${valueTypesForName.join(
+                                        "', "
+                                    )}'.`
                                 );
-
-                                resolvedModules.forEach(({ module }) => {
-                                    // Not all schemas have properties, hence the check
-                                    if (module[propertyThatCanCreateAScope]) {
-                                        expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
-                                            `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
-                                        );
-                                    }
-                                });
-                            });
-                        });
-                    });
-                });
-
-                describe('when that schema is one of the descendants of DataType', () => {
-                    it('should not allow that', () => {
-                        const dataTypeDescendantsModuleNames = [
-                            'False',
-                            'True',
-                            'Float',
-                            'Integer',
-                            'CssSelectorType',
-                            'PronounceableText',
-                            'URL',
-                            'XPathType'
-                        ];
-                        const propertyThatCanCreateAScope = 'identifier';
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            dataTypeDescendantsModuleNames.forEach((dataTypeModuleName) => {
-                                const DataTypeModule = resolvedModules.find(
-                                    ({ schemaName }) => schemaName === dataTypeModuleName
-                                );
-
-                                resolvedModules.forEach(({ module }) => {
-                                    // Not all schemas have properties, hence the check
-                                    if (module[propertyThatCanCreateAScope]) {
-                                        expect(() => module[propertyThatCanCreateAScope](DataTypeModule)).to.throw(
-                                            `Cant't create a scope using DataType schema (${dataTypeModuleName} used).`
-                                        );
-                                    }
-                                });
-                            });
+                            }
                         });
                     });
                 });
             });
-        });
 
-        describe('valueTypes checking (types properties accept)', () => {
-            describe('Text value type', () => {
-                const propertyThatAcceptsTextValue = 'name';
-                const moduleHasPropertyThatAcceptsTextValue = (module) => Boolean(module[propertyThatAcceptsTextValue]);
-
-                it('should return given value as is in content attribute', () => {
+            describe('when called with a Text data type Schema', () => {
+                it("should return Text value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const textValue = 'I am some text value';
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsTextValue(module)) {
-                                expect(module[propertyThatAcceptsTextValue](textValue)).to.contain(
-                                    `content="I am some text value"`
-                                );
-                            }
-                        });
+                        const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = Person.name(DataType.text('John'));
+
+                        expect(result).to.contain(' content="John"');
                     });
                 });
 
-                it('should not allow any other value than a text one', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const nonTextValue = true;
-
-                    buildModules({ buildPath, schemaData });
-
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsTextValue(module)) {
-                                expect(() => module[propertyThatAcceptsTextValue](nonTextValue)).to.throw(
-                                    'Text value type expected.'
-                                );
-                            }
-                        });
-                    });
-                });
-
-                describe('when that text value contains double quotes', () => {
+                describe('when contains double quotes', () => {
                     it('should escape them', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const textValueWithDoublequotes = 'I am "double quoted" text value';
-
-                        // prettier-ignore
-                        const expectedContent = 'content="I am \\"double quoted\\" text value"';
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatAcceptsTextValue(module)) {
-                                    expect(module[propertyThatAcceptsTextValue](textValueWithDoublequotes)).to.contain(
-                                        expectedContent
-                                    );
-                                }
-                            });
+                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            const result = Person.name(DataType.text('John "The Bull" Doe'));
+
+                            expect(result).to.contain(' content="John &quot;The Bull&quot; Doe"');
+                        });
+                    });
+                });
+
+                describe('when value is an empty string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => Person.name(DataType.text(''))).to.throw(
+                                "Empty string passed. Value can't be empty."
+                            );
+                        });
+                    });
+                });
+
+                describe('when value is not a string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => Person.name(DataType.text(42))).to.throw(
+                                "String value expected. 'number' (42) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe('CssSelectorType value type, which is a more specific Text-like value', () => {
-                const propertyThatAcceptsCssSelectorTypeValue = 'cssSelector';
-                const moduleHasPropertyThatAcceptsCssSelectorTypeValue = (module) =>
-                    Boolean(module[propertyThatAcceptsCssSelectorTypeValue]);
-
-                it('should return given value as is in content attribute', () => {
+            describe('when called with a CssSelectorType data type Schema', () => {
+                it("should return CssSelector value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const cssSelectorTypeValue = '.title';
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
-                                expect(
-                                    module[propertyThatAcceptsCssSelectorTypeValue](cssSelectorTypeValue)
-                                ).to.contain(`content=".title"`);
-                            }
-                        });
+                        const WebPageElement = resolvedModules.find(
+                            (module) => getSchemaName(module) === 'WebPageElement'
+                        );
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = WebPageElement.cssSelector(DataType.cssSelectorType('.some-class'));
+
+                        expect(result).to.contain(' content=".some-class"');
                     });
                 });
 
-                it('should not allow any other value than a text one', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const nonCssSelectorTypeValue = true;
-
-                    buildModules({ buildPath, schemaData });
-
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
-                                expect(() =>
-                                    module[propertyThatAcceptsCssSelectorTypeValue](nonCssSelectorTypeValue)
-                                ).to.throw('CssSelectorType value type expected.');
-                            }
-                        });
-                    });
-                });
-
-                describe('when value contains double quotes', () => {
+                describe('when contains double quotes', () => {
                     it('should escape them', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const textValueWithDoublequotes = 'a[href="https://example.com"]';
-
-                        // prettier-ignore
-                        const expectedContent = 'content="a[href=\\"https://example.com\\"]"';
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatAcceptsCssSelectorTypeValue(module)) {
-                                    expect(
-                                        module[propertyThatAcceptsCssSelectorTypeValue](textValueWithDoublequotes)
-                                    ).to.contain(expectedContent);
-                                }
-                            });
+                            const WebPageElement = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'WebPageElement'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            const result = WebPageElement.cssSelector(
+                                DataType.cssSelectorType('a[href="https://example.com"]')
+                            );
+
+                            expect(result).to.contain(' content="a[href=&quot;https://example.com&quot;]"');
+                        });
+                    });
+                });
+
+                describe('when value is an empty string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const WebPageElement = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'WebPageElement'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => WebPageElement.cssSelector(DataType.cssSelectorType(''))).to.throw(
+                                "Empty string passed. Value can't be empty."
+                            );
+                        });
+                    });
+                });
+
+                describe('when value is not a string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const WebPageElement = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'WebPageElement'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => WebPageElement.cssSelector(DataType.cssSelectorType(42))).to.throw(
+                                "String value expected. 'number' (42) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe('Boolean value type', () => {
-                const propertyThatTakesBooleanValue = 'isAccessibleForFree';
-                const moduleHasPropertyThatTakesBooleanValue = (module) =>
-                    Boolean(module[propertyThatTakesBooleanValue]);
-
-                it('should return boolean value in content attribute', () => {
+            describe('when called with a XPathType data type Schema', () => {
+                it("should return XPathType value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatTakesBooleanValue(module)) {
-                                expect(module[propertyThatTakesBooleanValue](true)).to.contain(`content="true"`);
-                                expect(module[propertyThatTakesBooleanValue](false)).to.contain(`content="false"`);
-                            }
+                        const WebPageElement = resolvedModules.find(
+                            (module) => getSchemaName(module) === 'WebPageElement'
+                        );
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = WebPageElement.xpath(DataType.xPathType('/some/path'));
+
+                        expect(result).to.contain(' content="/some/path"');
+                    });
+                });
+
+                describe('when value is an empty string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const WebPageElement = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'WebPageElement'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => WebPageElement.xpath(DataType.xPathType(''))).to.throw(
+                                "Empty string passed. Value can't be empty."
+                            );
                         });
                     });
                 });
 
-                it('should not allow any other value than a boolean one', () => {
-                    const nonBooleanValue = 'a string';
+                describe('when value is not a string', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const WebPageElement = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'WebPageElement'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => WebPageElement.xpath(DataType.xPathType(42))).to.throw(
+                                "String value expected. 'number' (42) passed."
+                            );
+                        });
+                    });
+                });
+            });
+
+            describe('when called with a URL data type Schema', () => {
+                it("should return URL value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatTakesBooleanValue(module)) {
-                                expect(() => module[propertyThatTakesBooleanValue](nonBooleanValue)).to.throw(
-                                    'Boolean value type expected.'
-                                );
-                            }
+                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = Place.sameAs(DataType.url('https://example.com'));
+
+                        expect(result).to.contain(' content="https://example.com"');
+                    });
+                });
+
+                describe('when contains double quotes', () => {
+                    it('should escape them', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            const result = Place.sameAs(DataType.url('https://example.com?q="something"'));
+
+                            expect(result).to.contain(' content="https://example.com?q=&quot;something&quot;');
+                        });
+                    });
+                });
+
+                describe('when value is not a URL', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => Place.sameAs(DataType.url(42))).to.throw('Value passed (42) is not a URL.');
                         });
                     });
                 });
             });
 
-            describe('Date data type', () => {
-                const propertyThatTakesDateValue = 'expires';
-                const moduleHasPropertyThatTakesDateValue = (module) => Boolean(module[propertyThatTakesDateValue]);
-
-                describe('when value is a valid, date only string', () => {
-                    it('should return that value as is in content attribute', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    expect(module[propertyThatTakesDateValue]('2020')).to.contain(`content="2020"`);
-                                    expect(module[propertyThatTakesDateValue]('2020-07')).to.contain(
-                                        `content="2020-07"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020-07-08')).to.contain(
-                                        `content="2020-07-08"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020.07.08')).to.contain(
-                                        `content="2020.07.08"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020/07/08')).to.contain(
-                                        `content="2020/07/08"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is an instance of Date', () => {
-                    it('should return date in minus separated format in content attribute honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    const date = new Date(Date.UTC(2020, 0, 1));
-
-                                    expect(module[propertyThatTakesDateValue](date)).to.contain(`content="2020-01-01"`);
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is a valid, datetime string', () => {
-                    it('should return date in minus separated format in content attribute honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    expect(module[propertyThatTakesDateValue]('2020 14:15')).to.contain(
-                                        `content="2020-01-01"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020-02 14:15')).to.contain(
-                                        `content="2020-02-01"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020-02-23 14:15')).to.contain(
-                                        `content="2020-02-23"`
-                                    );
-                                    expect(module[propertyThatTakesDateValue]('2020-02-23 14:15:16')).to.contain(
-                                        `content="2020-02-23"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is not a valid date string or Date instance', () => {
-                    it('should not allow such a value', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateValue(module)) {
-                                    const notADatetimeLikeString = 'foo';
-                                    const notADateInstanceObject = new URL('http://example.com');
-
-                                    expect(() => module[propertyThatTakesDateValue](notADatetimeLikeString)).to.throw(
-                                        'Date type value expected.'
-                                    );
-                                    expect(() => module[propertyThatTakesDateValue](notADateInstanceObject)).to.throw(
-                                        'Date type value expected.'
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
+            describe('when called with a PronounceableText data type Schema', () => {
+                it('is not used anywhere as DataType yet', () => {});
             });
 
-            describe('DateTime data type', () => {
-                const propertyThatTakesDateTimeValue = 'contentReferenceTime';
-                const moduleHasPropertyThatTakesDateTimeValue = (module) =>
-                    Boolean(module[propertyThatTakesDateTimeValue]);
-
-                describe('when value is a valid, datetime string', () => {
-                    it('should return datetime in ISO format honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateTimeValue(module)) {
-                                    expect(module[propertyThatTakesDateTimeValue]('2020 14:15')).to.contain(
-                                        `content="2020-01-01T14:15:00.000Z"`
-                                    );
-                                    expect(module[propertyThatTakesDateTimeValue]('2020-02 14:15')).to.contain(
-                                        `content="2020-02-01T14:15:00.000Z"`
-                                    );
-                                    expect(module[propertyThatTakesDateTimeValue]('2020-02-23 14:15')).to.contain(
-                                        `content="2020-02-23T14:15:00.000Z"`
-                                    );
-                                    expect(module[propertyThatTakesDateTimeValue]('2020-02-23 14:15:16')).to.contain(
-                                        `content="2020-02-23T14:15:16.000Z"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is an instance of Date', () => {
-                    it('should return date in minus separated format in content attribute honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateTimeValue(module)) {
-                                    const date = new Date('2020-01-01 00:00:00');
-
-                                    expect(module[propertyThatTakesDateTimeValue](date)).to.contain(
-                                        `content="2020-01-01T00:00:00.000Z"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is not a valid date string or Date instance', () => {
-                    it('should not allow such a value', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesDateTimeValue(module)) {
-                                    const notADatetimeLikeString = 'foo';
-                                    const notADateInstanceObject = new URL('http://example.com');
-
-                                    expect(() =>
-                                        module[propertyThatTakesDateTimeValue](notADatetimeLikeString)
-                                    ).to.throw('DateTime type value expected.');
-                                    expect(() =>
-                                        module[propertyThatTakesDateTimeValue](notADateInstanceObject)
-                                    ).to.throw('DateTime type value expected.');
-                                }
-                            });
-                        });
-                    });
-                });
-            });
-
-            describe('Time data type', () => {
-                const propertyThatTakesTimeValue = 'opens';
-                const moduleHasPropertyThatTakesTimeValue = (module) => Boolean(module[propertyThatTakesTimeValue]);
-
-                describe('when value is a valid, datetime string', () => {
-                    it('should return datetime in ISO format honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesTimeValue(module)) {
-                                    expect(module[propertyThatTakesTimeValue]('14:15')).to.contain(`content="14:15"`);
-                                    expect(module[propertyThatTakesTimeValue]('14:15:16')).to.contain(
-                                        `content="14:15:16"`
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is an instance of Date', () => {
-                    it('should return time in colon separated format in content attribute honoring UTC', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesTimeValue(module)) {
-                                    const date = new Date('2020-01-01 01:02:03');
-
-                                    expect(module[propertyThatTakesTimeValue](date)).to.contain(`content="01:02:03"`);
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is not a valid time string or Date instance', () => {
-                    it('should not allow such a value', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesTimeValue(module)) {
-                                    const notADatetimeLikeString = 'foo';
-                                    const notADateInstanceObject = new URL('http://example.com');
-
-                                    expect(() => module[propertyThatTakesTimeValue](notADatetimeLikeString)).to.throw(
-                                        'Time type value expected.'
-                                    );
-                                    expect(() => module[propertyThatTakesTimeValue](notADateInstanceObject)).to.throw(
-                                        'Time type value expected.'
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-            });
-
-            describe('Number data type', () => {
-                const propertyThatTakesNumberValue = 'maxValue';
-                const moduleHasPropertyThatTakesNumberValue = (module) => Boolean(module[propertyThatTakesNumberValue]);
-
-                it('should return number in content attribute', () => {
+            describe('when called with a Boolean data type Schema', () => {
+                it("should return Boolean value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatTakesNumberValue(module)) {
-                                expect(module[propertyThatTakesNumberValue](42)).to.contain(`content="42"`);
-                                expect(module[propertyThatTakesNumberValue](Math.PI)).to.contain(
-                                    `content="${Math.PI}"`
-                                );
-                            }
+                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = Place.smokingAllowed(DataType.boolean(true));
+
+                        expect(result).to.contain(' content="true"');
+                    });
+                });
+
+                describe('when value is not of boolean type', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => Place.smokingAllowed(DataType.boolean('foo'))).to.throw(
+                                "Boolean value expected. 'string' (foo) passed."
+                            );
+                        });
+                    });
+                });
+            });
+
+            describe('when called with a True data type Schema', () => {
+                it('is not used anywhere as DataType yet', () => {});
+            });
+
+            describe('when called with a False data type Schema', () => {
+                it('is not used anywhere as DataType yet', () => {});
+            });
+
+            describe('when called with a Number data type Schema', () => {
+                it("should return Number value as is in 'content' attribute", () => {
+                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                    buildModules({ buildPath, schemaData });
+
+                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = Place.longitude(DataType.number(12.15));
+
+                        expect(result).to.contain(' content="12.15"');
+                    });
+                });
+
+                describe('when value is not finite', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => Place.longitude(DataType.number(Infinity))).to.throw(
+                                'Infinite value passed. Use finite number.'
+                            );
+                            expect(() => Place.longitude(DataType.number(-Infinity))).to.throw(
+                                'Infinite value passed. Use finite number.'
+                            );
                         });
                     });
                 });
 
                 describe('when value is not a number', () => {
-                    it('should not allow such a value', () => {
+                    it('should not accept such value', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesNumberValue(module)) {
-                                    const notANumber = 'foo';
+                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
 
-                                    expect(() => module[propertyThatTakesNumberValue](notANumber)).to.throw(
-                                        'Number type value expected.'
-                                    );
-                                }
-                            });
-                        });
-                    });
-                });
-
-                describe('when value is an infinite number', () => {
-                    it('should not allow such a value as numbers are stringified', () => {
-                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
-
-                        buildModules({ buildPath, schemaData });
-
-                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesNumberValue(module)) {
-                                    expect(() => module[propertyThatTakesNumberValue](Infinity)).to.throw(
-                                        'Number type value expected.'
-                                    );
-                                    expect(() => module[propertyThatTakesNumberValue](-Infinity)).to.throw(
-                                        'Number type value expected.'
-                                    );
-                                }
-                            });
+                            expect(() => Place.longitude(DataType.number(true))).to.throw(
+                                "Number value expected. 'boolean' (true) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe('Integer data type', () => {
-                const propertyThatTakesIntegerValue = 'commentCount';
-                const moduleHasPropertyThatTakesIntegerValue = (module) =>
-                    Boolean(module[propertyThatTakesIntegerValue]);
-
-                it('should return integer number in content attribute', () => {
+            describe('when called with an Integer data type Schema', () => {
+                it("should return Integer value as is in 'content' attribute", () => {
                     const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatTakesIntegerValue(module)) {
-                                expect(module[propertyThatTakesIntegerValue](42)).to.contain(`content="42"`);
-                            }
-                        });
+                        const CreativeWork = resolvedModules.find((module) => getSchemaName(module) === 'CreativeWork');
+                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                        const result = CreativeWork.position(DataType.integer(42));
+
+                        expect(result).to.contain(' content="42"');
                     });
                 });
 
                 describe('when value is not an integer', () => {
-                    it('should not allow such a value', () => {
+                    it('should not accept such value', () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatTakesIntegerValue(module)) {
-                                    const notAnInteger = Math.PI;
+                            const CreativeWork = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'CreativeWork'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
 
-                                    expect(() => module[propertyThatTakesIntegerValue](notAnInteger)).to.throw(
-                                        'Integer type value expected.'
-                                    );
-                                }
-                            });
+                            expect(() => CreativeWork.position(DataType.integer(true))).to.throw(
+                                "Integer value expected. 'boolean' (true) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe('URL value type', () => {
-                const propertyThatAcceptsURLValue = 'sameAs';
-                const moduleHasPropertyThatAcceptsURLValue = (module) => Boolean(module[propertyThatAcceptsURLValue]);
+            describe('when called with a Float data type Schema', () => {
+                it('is not used anywhere as DataType yet', () => {});
+            });
 
-                it('should return given value as is in content attribute', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const urlValue = 'http://example.com';
+            describe('when called with a Date data type Schema', () => {
+                describe('when Date is passed as string', () => {
+                    it("should return Date value as is in 'content' attribute", () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
-                    buildModules({ buildPath, schemaData });
+                        buildModules({ buildPath, schemaData });
 
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsURLValue(module)) {
-                                expect(module[propertyThatAcceptsURLValue](urlValue)).to.contain(
-                                    `content="http://example.com"`
-                                );
-                            }
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            const fullDate = MediaObject.uploadDate(DataType.date('2020-05-27'));
+                            const yearAndMonth = MediaObject.uploadDate(DataType.date('2020-05'));
+                            const yearOnly = MediaObject.uploadDate(DataType.date('2020'));
+                            const bcDate = MediaObject.uploadDate(DataType.date('-2020-10-15'));
+
+                            expect(fullDate).to.contain(' content="2020-05-27"');
+                            expect(yearAndMonth).to.contain(' content="2020-05"');
+                            expect(yearOnly).to.contain(' content="2020"');
+                            expect(bcDate).to.contain(' content="-2020-10-15"');
                         });
                     });
-                });
 
-                it('should not allow any other value than a URL one', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const nonURLValueExamples = ['a', true, 42];
+                    describe('when passed not in ISO 8601 format', () => {
+                        it('should not accept such value', () => {
+                            const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
-                    buildModules({ buildPath, schemaData });
+                            buildModules({ buildPath, schemaData });
 
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsURLValue(module)) {
-                                nonURLValueExamples.forEach((nonURLValue) => {
-                                    expect(() => module[propertyThatAcceptsURLValue](nonURLValue)).to.throw(
-                                        'URL value type expected.'
+                            return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                                const MediaObject = resolvedModules.find(
+                                    (module) => getSchemaName(module) === 'MediaObject'
+                                );
+                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                                const nonIso8601DateFormatExamples = {
+                                    americanFormatWithDashes: '2020-27-05',
+                                    americanFormatWithDots: '2020.27.05',
+                                    americanFormatWithSlashes: '2020/27/05',
+                                    normalRestOfTheWorldFormatWithDots: '2020.05.27',
+                                    normalRestOfTheWorldFormatWithSlashes: '2020/05/27',
+                                    someDateTime: '2020-05-27 15:04',
+                                    iso8601FormatButADateTime: '2020-08-29T12:03:18+00:00'
+                                };
+
+                                Object.values(nonIso8601DateFormatExamples).forEach((nonIso8601DateFormat) => {
+                                    expect(() => MediaObject.uploadDate(DataType.date(nonIso8601DateFormat))).to.throw(
+                                        `Date in ISO 8601 format expected. ${nonIso8601DateFormat} passed.`
                                     );
                                 });
-                            }
+                            });
                         });
                     });
                 });
 
-                describe('when that text value contains double quotes', () => {
-                    it('should escape them', () => {
+                describe("when Date is passed as a Date (JavaScript's) instance", () => {
+                    it("should return Date value as is in 'content' attribute", () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const urlValueWithDoublequotes = 'http://example.com/?query="Shall this pass?"';
-
-                        // prettier-ignore
-                        const expectedContent = 'http://example.com/?query=\\"Shall this pass?\\"';
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatAcceptsURLValue(module)) {
-                                    expect(module[propertyThatAcceptsURLValue](urlValueWithDoublequotes)).to.contain(
-                                        expectedContent
-                                    );
-                                }
-                            });
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const date = new Date(Date.UTC(2020, 5, 12));
+
+                            const result = MediaObject.uploadDate(DataType.date(date));
+
+                            expect(result).to.contain(` content="2020-06-12"`);
+                        });
+                    });
+                });
+
+                describe('when Date is any other value', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => MediaObject.uploadDate(DataType.date(true))).to.throw(
+                                "String or Date instance value expected. 'boolean' (true) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe('XPathType value type', () => {
-                const propertyThatAcceptsXPathTypeValue = 'xpath';
-                const moduleHasPropertyThatAcceptsXPathTypeValue = (module) =>
-                    Boolean(module[propertyThatAcceptsXPathTypeValue]);
+            describe('when called with a DateTime data type Schema', () => {
+                describe('when DateTime is passed as string', () => {
+                    it("should return DateTime value as is in 'content' attribute", () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
 
-                it('should return given value as is in content attribute', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const xPathValue = '/some/path';
+                        buildModules({ buildPath, schemaData });
 
-                    buildModules({ buildPath, schemaData });
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
 
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
-                                expect(module[propertyThatAcceptsXPathTypeValue](xPathValue)).to.contain(
-                                    `content="/some/path"`
+                            const dateTime = MediaObject.startTime(DataType.dateTime('2020-08-29T12:03:18'));
+                            const zoneDateTime = MediaObject.startTime(DataType.dateTime('2020-08-29T12:03:18Z'));
+                            const shiftedDateTime = MediaObject.startTime(
+                                DataType.dateTime('2020-08-29T12:03:18+01:00')
+                            );
+                            const bcDateTime = MediaObject.startTime(DataType.dateTime('-2020-08-29T12:03:18Z'));
+
+                            expect(dateTime).to.contain(' content="2020-08-29T12:03:18"');
+                            expect(zoneDateTime).to.contain(' content="2020-08-29T12:03:18Z"');
+                            expect(shiftedDateTime).to.contain(' content="2020-08-29T12:03:18+01:00"');
+                            expect(bcDateTime).to.contain(' content="-2020-08-29T12:03:18Z"');
+                        });
+                    });
+
+                    describe('when passed not in Schema acceptable ISO 8601 format', () => {
+                        it('should not accept such value', () => {
+                            const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                            buildModules({ buildPath, schemaData });
+
+                            return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                                const MediaObject = resolvedModules.find(
+                                    (module) => getSchemaName(module) === 'MediaObject'
                                 );
-                            }
+                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                                expect(() => MediaObject.startTime(DataType.dateTime('2020-27-05'))).to.throw(
+                                    `Date in [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] format expected. 2020-27-05 passed.`
+                                );
+                            });
                         });
                     });
                 });
 
-                it('should not allow any other value than an XPathType one (string checking at the moment)', () => {
-                    const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                    const nonStringValueExamples = [true, 42];
-
-                    buildModules({ buildPath, schemaData });
-
-                    return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        resolvedModules.forEach(({ module }) => {
-                            if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
-                                nonStringValueExamples.forEach((nonStringValue) => {
-                                    expect(() => module[propertyThatAcceptsXPathTypeValue](nonStringValue)).to.throw(
-                                        'XPathType value type expected.'
-                                    );
-                                });
-                            }
-                        });
-                    });
-                });
-
-                describe('when that text value contains double quotes', () => {
-                    it('should escape them', () => {
+                describe("when DateTime is passed as a Date (JavaScript's) instance", () => {
+                    it("should return DateTime value as is in 'content' attribute", () => {
                         const buildPath = path.resolve(tempDir.name, testBuildFolder);
-                        const urlValueWithDoublequotes = 'http://example.com/?query="Shall this pass?"';
-
-                        // prettier-ignore
-                        const expectedContent = 'http://example.com/?query=\\"Shall this pass?\\"';
 
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            resolvedModules.forEach(({ module }) => {
-                                if (moduleHasPropertyThatAcceptsXPathTypeValue(module)) {
-                                    expect(
-                                        module[propertyThatAcceptsXPathTypeValue](urlValueWithDoublequotes)
-                                    ).to.contain(expectedContent);
-                                }
-                            });
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const date = new Date(Date.UTC(2020, 5, 13, 12, 13, 14));
+
+                            const result = MediaObject.startTime(DataType.dateTime(date));
+
+                            expect(result).to.contain(` content="2020-06-13T12:13:14Z"`);
+                        });
+                    });
+                });
+
+                describe('when Date is any other value', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => MediaObject.uploadDate(DataType.dateTime(true))).to.throw(
+                                "String or Date instance value expected. 'boolean' (true) passed."
+                            );
                         });
                     });
                 });
             });
 
-            describe.skip('PronounceableText value type', () => {
-                // Not used yet.
+            describe('when called with a Time data type Schema', () => {
+                describe('when Time is passed as string', () => {
+                    it("should return Time value as is in 'content' attribute", () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            const simpleTime = MediaObject.startTime(DataType.time('12:03:18'));
+                            const zoneTime = MediaObject.startTime(DataType.time('12:03:18Z'));
+                            const shiftedTime = MediaObject.startTime(DataType.time('12:03:18+01:00'));
+
+                            expect(simpleTime).to.contain(' content="12:03:18"');
+                            expect(zoneTime).to.contain(' content="12:03:18Z"');
+                            expect(shiftedTime).to.contain(' content="12:03:18+01:00"');
+                        });
+                    });
+
+                    describe('when passed not in Schema acceptable format', () => {
+                        it('should not accept such value', () => {
+                            const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                            buildModules({ buildPath, schemaData });
+
+                            return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                                const MediaObject = resolvedModules.find(
+                                    (module) => getSchemaName(module) === 'MediaObject'
+                                );
+                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                                expect(() => MediaObject.startTime(DataType.time('15:00'))).to.throw(
+                                    `Time in hh:mm:ss[Z|(+|-)hh:mm] format expected. 15:00 passed.`
+                                );
+                            });
+                        });
+                    });
+                });
+
+                describe("when Time is passed as a Date (JavaScript's) instance", () => {
+                    it("should return Time value as is in 'content' attribute", () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const date = new Date(Date.UTC(2020, 5, 13, 12, 13, 14));
+
+                            const result = MediaObject.startTime(DataType.time(date));
+
+                            expect(result).to.contain(` content="12:13:14Z"`);
+                        });
+                    });
+                });
+
+                describe('when Time is any other value', () => {
+                    it('should not accept such value', () => {
+                        const buildPath = path.resolve(tempDir.name, testBuildFolder);
+
+                        buildModules({ buildPath, schemaData });
+
+                        return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
+                            const MediaObject = resolvedModules.find(
+                                (module) => getSchemaName(module) === 'MediaObject'
+                            );
+                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+
+                            expect(() => MediaObject.uploadDate(DataType.time(true))).to.throw(
+                                "String or Date instance value expected. 'boolean' (true) passed."
+                            );
+                        });
+                    });
+                });
             });
         });
     });
