@@ -2,7 +2,8 @@ import {
     ensureSchemaVariableNameIsSyntaxCompatible,
     escapeDoubleQuotes,
     stripMilliseconds,
-    stripUprightDashIfPresent
+    stripUprightDashIfPresent,
+    throwIfDoesNotAcceptSchemaAsValue
 } from './utils';
 import { textDataTypeSourceCode } from './data-type-function-sources/text';
 import { cssSelectorDataTypeSourceCode } from './data-type-function-sources/cssSelector';
@@ -56,16 +57,6 @@ const createAncestorPropertiesInclusionCode = (parentSchemaNames) =>
     ...${syntaxCompatibleSchemaName},`;
         }, '')
         .trim();
-
-const throwIfDoesNotAcceptSchemaAsValue = (schemaName, propertyName, allowedValues) => {
-    if (!allowedValues.includes(schemaName)) {
-        throw new Error(
-            `'${schemaName}' can't be used as value for '${propertyName}' property. '${propertyName}' accepts only: '${allowedValues.join(
-                "', "
-            )}'.`
-        );
-    }
-};
 
 /* eslint-disable no-underscore-dangle */
 const _base = {

@@ -12,3 +12,12 @@ export const ensureSchemaVariableNameIsSyntaxCompatible = (schemaName) => {
 export const escapeDoubleQuotes = (string) => string.replace(/\\([\s\S])|(")/g, '&quot;$1');
 export const stripUprightDashIfPresent = (string) => (string.charAt(0) === '-' ? string.substr(1) : string);
 export const stripMilliseconds = (isoDateTimeString) => `${isoDateTimeString.split('.')[0]}Z`;
+export const throwIfDoesNotAcceptSchemaAsValue = (schemaName, propertyName, allowedValues) => {
+    if (!allowedValues.includes(schemaName)) {
+        throw new Error(
+            `'${schemaName}' can't be used as value for '${propertyName}' property. '${propertyName}' accepts only: '${allowedValues.join(
+                "', "
+            )}'.`
+        );
+    }
+};
