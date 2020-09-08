@@ -70,7 +70,7 @@ const _base = {
             if (isDataTypeSchema) {
                 content = value._content;
             } else {
-                content = ` itemscope itemtype="http://schema.org/${value._schemaName}"`;
+                content = ` itemscope itemtype="https://schema.org/${value._schemaName}"`;
             }
         }
 
