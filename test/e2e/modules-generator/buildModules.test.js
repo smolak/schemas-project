@@ -35,6 +35,8 @@ describe('buildModules', () => {
     });
 
     const getSchemaName = ({ _schemaName }) => _schemaName;
+    const getModule = (schemaName, resolvedModules) =>
+        resolvedModules.find((module) => getSchemaName(module) === schemaName);
 
     it('should create modules named after Schemas coming from schema data', () => {
         const buildPath = path.resolve(tempDir.name, testBuildFolder);
@@ -121,9 +123,7 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const PropertyValue = resolvedModules.find(
-                            (module) => getSchemaName(module) === 'PropertyValue'
-                        );
+                        const PropertyValue = getModule('PropertyValue', resolvedModules);
 
                         resolvedModules.forEach((Schema) => {
                             const propertyThatCanCreateAScope = 'identifier';
@@ -146,9 +146,7 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const LocalBusiness = resolvedModules.find(
-                            (module) => getSchemaName(module) === 'LocalBusiness'
-                        );
+                        const LocalBusiness = getModule('LocalBusiness', resolvedModules);
 
                         resolvedModules.forEach((module) => {
                             const propertyThatDoesNotAcceptLocalBusinessAsValue = 'name';
@@ -174,8 +172,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const Person = getModule('Person', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = Person.name(DataType.text('John'));
 
@@ -190,8 +188,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Person = getModule('Person', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const result = Person.name(DataType.text('John "The Bull" Doe'));
 
@@ -207,8 +205,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Person = getModule('Person', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Person.name(DataType.text(''))).to.throw(
                                 "Empty string passed. Value can't be empty."
@@ -224,8 +222,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Person = resolvedModules.find((module) => getSchemaName(module) === 'Person');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Person = getModule('Person', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Person.name(DataType.text(42))).to.throw(
                                 "String value expected. 'number' (42) passed."
@@ -242,10 +240,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const WebPageElement = resolvedModules.find(
-                            (module) => getSchemaName(module) === 'WebPageElement'
-                        );
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const WebPageElement = getModule('WebPageElement', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = WebPageElement.cssSelector(DataType.cssSelectorType('.some-class'));
 
@@ -260,10 +256,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const WebPageElement = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'WebPageElement'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const WebPageElement = getModule('WebPageElement', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const result = WebPageElement.cssSelector(
                                 DataType.cssSelectorType('a[href="https://example.com"]')
@@ -281,10 +275,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const WebPageElement = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'WebPageElement'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const WebPageElement = getModule('WebPageElement', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => WebPageElement.cssSelector(DataType.cssSelectorType(''))).to.throw(
                                 "Empty string passed. Value can't be empty."
@@ -300,10 +292,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const WebPageElement = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'WebPageElement'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const WebPageElement = getModule('WebPageElement', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => WebPageElement.cssSelector(DataType.cssSelectorType(42))).to.throw(
                                 "String value expected. 'number' (42) passed."
@@ -320,10 +310,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const WebPageElement = resolvedModules.find(
-                            (module) => getSchemaName(module) === 'WebPageElement'
-                        );
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const WebPageElement = getModule('WebPageElement', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = WebPageElement.xpath(DataType.xPathType('/some/path'));
 
@@ -338,10 +326,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const WebPageElement = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'WebPageElement'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const WebPageElement = getModule('WebPageElement', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => WebPageElement.xpath(DataType.xPathType(''))).to.throw(
                                 "Empty string passed. Value can't be empty."
@@ -357,10 +343,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const WebPageElement = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'WebPageElement'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const WebPageElement = getModule('WebPageElement', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => WebPageElement.xpath(DataType.xPathType(42))).to.throw(
                                 "String value expected. 'number' (42) passed."
@@ -377,8 +361,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const Place = getModule('Place', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = Place.sameAs(DataType.url('https://example.com'));
 
@@ -393,8 +377,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Place = getModule('Place', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const result = Place.sameAs(DataType.url('https://example.com?q="something"'));
 
@@ -410,8 +394,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Place = getModule('Place', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Place.sameAs(DataType.url(42))).to.throw('Value passed (42) is not a URL.');
                         });
@@ -430,8 +414,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const Place = getModule('Place', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = Place.smokingAllowed(DataType.boolean(true));
 
@@ -446,8 +430,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Place = getModule('Place', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Place.smokingAllowed(DataType.boolean('foo'))).to.throw(
                                 "Boolean value expected. 'string' (foo) passed."
@@ -472,8 +456,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const Place = getModule('Place', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = Place.longitude(DataType.number(12.15));
 
@@ -488,8 +472,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Place = getModule('Place', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Place.longitude(DataType.number(Infinity))).to.throw(
                                 'Infinite value passed. Use finite number.'
@@ -508,8 +492,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const Place = resolvedModules.find((module) => getSchemaName(module) === 'Place');
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const Place = getModule('Place', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => Place.longitude(DataType.number(true))).to.throw(
                                 "Number value expected. 'boolean' (true) passed."
@@ -526,8 +510,8 @@ describe('buildModules', () => {
                     buildModules({ buildPath, schemaData });
 
                     return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                        const CreativeWork = resolvedModules.find((module) => getSchemaName(module) === 'CreativeWork');
-                        const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                        const CreativeWork = getModule('CreativeWork', resolvedModules);
+                        const DataType = getModule('DataType', resolvedModules);
 
                         const result = CreativeWork.position(DataType.integer(42));
 
@@ -542,10 +526,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const CreativeWork = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'CreativeWork'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const CreativeWork = getModule('CreativeWork', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => CreativeWork.position(DataType.integer(true))).to.throw(
                                 "Integer value expected. 'boolean' (true) passed."
@@ -567,10 +549,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const fullDate = MediaObject.uploadDate(DataType.date('2020-05-27'));
                             const yearAndMonth = MediaObject.uploadDate(DataType.date('2020-05'));
@@ -591,10 +571,8 @@ describe('buildModules', () => {
                             buildModules({ buildPath, schemaData });
 
                             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                                const MediaObject = resolvedModules.find(
-                                    (module) => getSchemaName(module) === 'MediaObject'
-                                );
-                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                                const MediaObject = getModule('MediaObject', resolvedModules);
+                                const DataType = getModule('DataType', resolvedModules);
                                 const nonIso8601DateFormatExamples = {
                                     americanFormatWithDashes: '2020-27-05',
                                     americanFormatWithDots: '2020.27.05',
@@ -622,10 +600,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
                             const date = new Date(Date.UTC(2020, 5, 12));
 
                             const result = MediaObject.uploadDate(DataType.date(date));
@@ -642,10 +618,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => MediaObject.uploadDate(DataType.date(true))).to.throw(
                                 "String or Date instance value expected. 'boolean' (true) passed."
@@ -663,10 +637,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const dateTime = MediaObject.startTime(DataType.dateTime('2020-08-29T12:03:18'));
                             const zoneDateTime = MediaObject.startTime(DataType.dateTime('2020-08-29T12:03:18Z'));
@@ -689,10 +661,8 @@ describe('buildModules', () => {
                             buildModules({ buildPath, schemaData });
 
                             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                                const MediaObject = resolvedModules.find(
-                                    (module) => getSchemaName(module) === 'MediaObject'
-                                );
-                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                                const MediaObject = getModule('MediaObject', resolvedModules);
+                                const DataType = getModule('DataType', resolvedModules);
 
                                 expect(() => MediaObject.startTime(DataType.dateTime('2020-27-05'))).to.throw(
                                     `Date in [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] format expected. 2020-27-05 passed.`
@@ -709,10 +679,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
                             const date = new Date(Date.UTC(2020, 5, 13, 12, 13, 14));
 
                             const result = MediaObject.startTime(DataType.dateTime(date));
@@ -729,10 +697,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => MediaObject.uploadDate(DataType.dateTime(true))).to.throw(
                                 "String or Date instance value expected. 'boolean' (true) passed."
@@ -750,10 +716,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             const simpleTime = MediaObject.startTime(DataType.time('12:03:18'));
                             const zoneTime = MediaObject.startTime(DataType.time('12:03:18Z'));
@@ -772,10 +736,8 @@ describe('buildModules', () => {
                             buildModules({ buildPath, schemaData });
 
                             return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                                const MediaObject = resolvedModules.find(
-                                    (module) => getSchemaName(module) === 'MediaObject'
-                                );
-                                const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                                const MediaObject = getModule('MediaObject', resolvedModules);
+                                const DataType = getModule('DataType', resolvedModules);
 
                                 expect(() => MediaObject.startTime(DataType.time('15:00'))).to.throw(
                                     `Time in hh:mm:ss[Z|(+|-)hh:mm] format expected. 15:00 passed.`
@@ -792,10 +754,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
                             const date = new Date(Date.UTC(2020, 5, 13, 12, 13, 14));
 
                             const result = MediaObject.startTime(DataType.time(date));
@@ -812,10 +772,8 @@ describe('buildModules', () => {
                         buildModules({ buildPath, schemaData });
 
                         return importBuiltModules({ buildPath, schemaData }).then((resolvedModules) => {
-                            const MediaObject = resolvedModules.find(
-                                (module) => getSchemaName(module) === 'MediaObject'
-                            );
-                            const DataType = resolvedModules.find((module) => getSchemaName(module) === 'DataType');
+                            const MediaObject = getModule('MediaObject', resolvedModules);
+                            const DataType = getModule('DataType', resolvedModules);
 
                             expect(() => MediaObject.uploadDate(DataType.time(true))).to.throw(
                                 "String or Date instance value expected. 'boolean' (true) passed."
