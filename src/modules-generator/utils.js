@@ -9,3 +9,4 @@ export const ensureSchemaVariableNameIsSyntaxCompatible = (schemaName) => {
 
     return schemaName;
 };
+export const escapeDoubleQuotes = (string) => string.replace(/\\([\s\S])|(")/g, '&quot;$1');

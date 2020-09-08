@@ -1,4 +1,4 @@
-import { ensureSchemaVariableNameIsSyntaxCompatible } from './utils';
+import { ensureSchemaVariableNameIsSyntaxCompatible, escapeDoubleQuotes } from './utils';
 
 const createOwnPropertiesCode = (schemaProperties, allProperties) =>
     schemaProperties.own
@@ -50,10 +50,6 @@ const throwIfDoesNotAcceptSchemaAsValue = (schemaName, propertyName, allowedValu
             )}'.`
         );
     }
-};
-
-const escapeDoubleQuotes = (string) => {
-    return string.replace(/\\([\s\S])|(")/g, '&quot;$1');
 };
 
 /* eslint-disable no-underscore-dangle */
