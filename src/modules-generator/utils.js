@@ -16,7 +16,7 @@ export const throwIfDoesNotAcceptSchemaAsValue = (schemaName, propertyName, allo
     if (!allowedValues.includes(schemaName)) {
         throw new Error(
             `'${schemaName}' can't be used as value for '${propertyName}' property. '${propertyName}' accepts only: '${allowedValues.join(
-                "', "
+                "', '"
             )}'.`
         );
     }

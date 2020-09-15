@@ -156,7 +156,7 @@ describe('buildModules', () => {
                             if (module[propertyThatDoesNotAcceptLocalBusinessAsValue]) {
                                 expect(() => module.name(LocalBusiness)).to.throw(
                                     `'LocalBusiness' can't be used as value for 'name' property. 'name' accepts only: '${valueTypesForName.join(
-                                        "', "
+                                        "', '"
                                     )}'.`
                                 );
                             }
