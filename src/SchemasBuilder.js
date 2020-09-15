@@ -13,6 +13,8 @@ const removeArchived = (items) => {
     });
 };
 
+const makeSureParentsAreUnique = (parents) => [...new Set(parents)];
+
 export class SchemasBuilder {
     constructor({
         latestVersionNumberFetcher,
@@ -90,7 +92,7 @@ export class SchemasBuilder {
             const ancestorsProperties = ancestorSchemas.reduce((allAncestorProperties, ancestorSchema) => {
                 return {
                     ...allAncestorProperties,
-                    [ancestorSchema]: getPropertiesForSchema(ancestorSchema)
+                    [ancestorSchema]: getPropertiesForSchema(ancestorSchema).sort()
                 };
             }, {});
 
@@ -98,9 +100,11 @@ export class SchemasBuilder {
                 ...allSchemas,
                 [schemaLabel]: {
                     ...schemaData,
+                    children: schemaData.children.sort(),
+                    parents: makeSureParentsAreUnique(schemaData.parents).sort(),
                     properties: {
-                        all: extractedSchemas.map(getPropertiesForSchema).flat(),
-                        own: getPropertiesForSchema(schemaLabel),
+                        all: extractedSchemas.map(getPropertiesForSchema).flat().sort(),
+                        own: getPropertiesForSchema(schemaLabel).sort(),
                         ...ancestorsProperties
                     }
                 }

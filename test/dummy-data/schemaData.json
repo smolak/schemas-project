@@ -2607,7 +2607,7 @@
         },
         "Time": {
             "children": [],
-            "parents": ["DataType", "DataType"],
+            "parents": ["DataType"],
             "specificityPaths": ["DataType.Time"],
             "properties": { "all": [], "own": [], "DataType": [] }
         }
