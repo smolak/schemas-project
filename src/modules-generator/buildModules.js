@@ -21,10 +21,7 @@ export const buildModules = ({ buildPath, schemaData }) => {
         const fileName = createFileName(schemaName);
         const filePath = path.resolve(buildPath, fileName);
         const schemaProperties = schemaData.schemas[schemaName].properties;
-
-        const parentSchemaNames = Object.keys(schemaProperties).filter(
-            (propertiesGroupName) => propertiesGroupName !== 'all' && propertiesGroupName !== 'own'
-        );
+        const parentSchemaNames = schemaData.schemas[schemaName].parents;
 
         const moduleCode = createModuleCode({ schemaName, parentSchemaNames, schemaProperties, allProperties });
 
